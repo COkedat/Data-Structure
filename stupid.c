@@ -91,7 +91,7 @@ void insert_edge(GraphType* g, int start, int end)
 }
 // 인접 행렬로 표현된 그래프에 대한 깊이 우선 탐색
 void dfs_iterative(GraphType* g, int v) {
-	StackType* s;
+	StackType s;
 	init_stack(&s);
 	int w;
 	push(&s, v); // 시작 정점을 스택에 저장
