@@ -79,9 +79,8 @@
             "command": "cmd",
             "group": "test",
             "args": [
-                "/C", "${fileDirname}\\${fileBasenameNoExtension}"
+                "/C", "${fileDirname}\\${fileBasenameNoExtension}","${fileDirname}"
             ]
-   
         }
     ]
 }

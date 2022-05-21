@@ -18,30 +18,31 @@ char *csvLists[20]={"1호선","2호선","3호선","4호선","5호선","6호선",
 void readCSV(int i){
     char buf[2048];
     char fileDir[50]="./data/";
-    //char* pLine;
-    printf("%c \n",csvLists[i]);
 
     strcat(fileDir,csvLists[i]);
     strcat(fileDir,".csv");
-    FILE* stream=NULL;
+    
+    printf("%s \n",fileDir);
 
+    FILE* stream=NULL;
     stream=fopen(fileDir,"r");
-    if( stream != NULL )
-    {   
+    if( stream != NULL ){   
         while( !feof( stream ) ){
             fgets( buf, 2048, stream );          
-            printf( "%s", buf );            
+            printf( "%s\n", buf );            
         }       
+    }
+    else{
+        printf("Failed to load %s !!!",fileDir);
     }
     fclose(stream);
 }
 
-int test=1;
 
 int main(){
     printf("pootis \n");
-    printf("strange %c %d \n",csvLists[0][1],test);
-    readCSV(1);
+    readCSV(0);
 
+    system("PAUSE");
     return 0;
 }
