@@ -79,8 +79,9 @@
             "command": "cmd",
             "group": "test",
             "args": [
-                "/C", "${fileDirname}\\${fileBasenameNoExtension}","${fileDirname}"
-            ]
+                "/C", "${fileDirname}\\${fileBasenameNoExtension}"
+            ],
+            "options": {"cwd": "${fileDirname}"}
         }
     ]
 }

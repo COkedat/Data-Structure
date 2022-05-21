@@ -43,6 +43,6 @@ int main(){
     printf("pootis \n");
     readCSV(1);
 
-    system("PAUSE");
+    //system("PAUSE");
     return 0;
 }
