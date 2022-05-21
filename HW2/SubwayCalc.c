@@ -18,8 +18,8 @@ int C_tmp=0; // 아마 행렬 전역변수
 
 typedef struct element{ // 구조체
     //char* name; // 역이름?
-    char* from; // 출발지
-    char* to; // 목적지
+    char from[10]; // 출발지
+    char to[10]; // 목적지
     int data; // 가는 시간
     int ic; // 환승 여부
 } element;
@@ -43,40 +43,31 @@ char *csvLists[20]={"1호선","1지선","2호선","2지선","3호선","4호선",
 
 
 element** makeArray(){
-    int r,c=556;
-
-    element **arr = malloc(sizeof(element *) * r);   // 이중 포인터에 (element 포인터 크기 * row)만큼 동적 메모리 할당. 배열의 세로
-    for (int i = 0; i < r; i++)            // 세로 크기만큼 반복
+    element **arr = malloc(sizeof(element *) * R);   // 이중 포인터에 (element 포인터 크기 * row)만큼 동적 메모리 할당. 배열의 세로
+    for (int i = 0; i < R; i++)            // 세로 크기만큼 반복
     {
-        arr[i] =malloc(sizeof(element) * c);    // (int의 크기 * col)만큼 동적 메모리 할당. 배열의 가로
+        arr[i] =malloc(sizeof(element) * C);    // (int의 크기 * col)만큼 동적 메모리 할당. 배열의 가로
     }
     return arr;
 }
 
-element** initArray(element** arr){
-    int r,c=556;
-
-    for (int i = 0; i < r; i++){
-        for (int j = 0; j < c; j++){
+void initArray(element** arr){
+    for (int i = 0; i < R; i++){
+        for (int j = 0; j < C; j++){
                 strcpy(arr[i][j].from,"");
                 strcpy(arr[i][j].to,"");
                 arr[i][j].data=9999;
                 arr[i][j].ic=FALSE;
             }
     }
-    return arr;
 }
 
 void killArray(element** arr){
-    int r=556;
-    printf("remove started\n");
 
-    for (int i = 0; i < r; i++) {
-        printf("remove started %d\n",i);
+    for (int i = 0; i < R; i++) {
         free(arr[i]);
     }
     free(arr);
-    printf("removed\n");
 }
 
 element makeElement(){
@@ -116,13 +107,13 @@ int main(){
     //readCSV(19);
 
     element** test= makeArray();
-    test=initArray(test);
+    initArray(test);
     strcpy(test[0][0].from,"아싸좋아요");
-    printf("%s",test[0][0].from);
+    printf("%s \n",test[0][0].from);
     //printf("%d",test[0][0].data);
 
     //system("PAUSE");
     killArray(test);
-    printf("sus\n");
+    printf("sus \n");
     return 0;
 }
