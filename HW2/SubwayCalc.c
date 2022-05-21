@@ -1,17 +1,47 @@
-// ì§€í•˜ì²  ìµœë‹¨ê±°ë¦¬, ìµœì†Œí™˜ìŠ¹ ê³„ì‚°ê¸°
+// ÁöÇÏÃ¶ ÃÖ´Ü°Å¸® ÃÖ¼ÒÈ¯½Â ÇÁ·Î±×·¥
 
 #include <stdio.h>
 #include <stdlib.h>
-struct element{ //êµ¬ì¡°ì²´ í•¨ìˆ˜
-    int data; //ê°€ëŠ” ì‹œê°„
-    int ic; //í™˜ìŠ¹ ì—¬ë¶€
-};
+#include <string.h>
+typedef struct element{ // ±¸Á¶Ã¼
+    char from; // Ãâ¹ßÁö
+    char to; // ¸ñÀûÁö
+    int data; // °¡´Â ½Ã°£
+    int ic; // È¯½Â ¿©ºÎ
+} element;
+
+char *csvLists[20]={"1È£¼±","2È£¼±","3È£¼±","4È£¼±","5È£¼±","6È£¼±",
+                    "7È£¼±","8È£¼±","9È£¼±","1È£¼±","2È£¼±","5È£¼±",
+                    "°æÀÇ¼±","°æÃá¼±","°øÇ×Ã¶µµ","ºÐ´ç¼±","ÀÎÃµ1¼±","Áß¾Ó¼±","¿ªÀÌ¸§","È¯½ÂÁ¤º¸"};
 
 
+void readCSV(int i){
+    char buf[2048];
+    char fileDir[50]="./data/";
+    //char* pLine;
+    printf("%c \n",csvLists[i]);
 
+    strcat(fileDir,csvLists[i]);
+    strcat(fileDir,".csv");
+    FILE* stream=NULL;
 
+    stream=fopen(fileDir,"r");
+    if( stream != NULL )
+    {   
+        while( !feof( stream ) ){
+            fgets( buf, 2048, stream );          
+            printf( "%s", buf );            
+        }       
+    }
+    fclose(stream);
+}
+
+int test=1;
 
 int main(){
-    printf("pootis");
+    printf("pootis \n");
+    printf("strange %c %d \n",csvLists[0][1],test);
+    readCSV(1);
+
     return 0;
 }
