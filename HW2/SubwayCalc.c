@@ -17,6 +17,11 @@ int C=556; // 아마 행렬 전역변수
 int R_tmp=0; // 아마 행렬 전역변수
 int C_tmp=0; // 아마 행렬 전역변수
 
+typedef struct sublist{ // 구조체
+    char name[20]; // 역명
+    char code[20]; // 역 코드
+} sublist;
+
 typedef struct element{ // 구조체
     //char* name; // 역이름?
     char from[10]; // 출발지
@@ -26,7 +31,7 @@ typedef struct element{ // 구조체
 } element;
 
 
-//안쓸수도있음
+//안쓸것같음
 /*
 typedef struct GraphType {
 	int n;	// 정점의 개수
