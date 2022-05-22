@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <locale.h>
 
 #define TRUE 1
 #define FALSE 0
@@ -84,13 +85,15 @@ void readCSV(int i){
     printf("%s \n",fileDir);
 
     FILE* stream=NULL;
+    setlocale(LC_ALL, "UTF-8");
     stream=fopen(fileDir,"r");
+
     if( stream != NULL ){   
-        while( !feof( stream ) ){
+        while( fgets( buf, 2048, stream )!=NULL ){ 
             fgets( buf, 2048, stream );          
-            printf( "%s\n", buf );            
-        }       
-    }
+            printf("%s\n", buf );             
+        }
+	} 
     else{
         printf("Failed to load %s !!!",fileDir);
     }
@@ -104,7 +107,7 @@ void readCSV(int i){
 
 int main(){
     printf("pootis \n");
-    readCSV(3);
+    readCSV(18);
 
     element** test= makeArray();
     initArray(test);
