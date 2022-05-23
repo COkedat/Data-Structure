@@ -8,18 +8,19 @@
 #define TRUE 1
 #define FALSE 0
 #define INF	9999
+#define MAX_VERTICES 552 //정점(역)의 수
 
 int Sub_Time=0; // 이동 시간 전역변수 (환승 시간 제외)
 int IC_Time=0; // 환승 시간 전역변수
 int IC_Cnt=0; // 환승 횟수 전역변수
-int R=556; // 아마 행렬 전역변수
-int C=556; // 아마 행렬 전역변수
-int R_tmp=0; // 아마 행렬 전역변수
-int C_tmp=0; // 아마 행렬 전역변수
+const int R=MAX_VERTICES; // 행렬 상수
+const int C=MAX_VERTICES; // 행렬 상수
+int R_tmp=0; // 행렬 전역변수 (삽입용)
+int C_tmp=0; // 행렬 전역변수 (삽입용)
 
 typedef struct sublist{ // 구조체
-    char name[20]; // 역명
-    char code[20]; // 역 코드
+    char name[30]; // 역명
+    char code[10]; // 역 코드
 } sublist;
 
 typedef struct element{ // 구조체
@@ -30,16 +31,17 @@ typedef struct element{ // 구조체
     int ic; // 환승 여부
 } element;
 
+int distance[MAX_VERTICES]; //시작 역으로부터의 최단 경로 거리
+int found[MAX_VERTICES]; // 방문한 역 표시
+int path[MAX_VERTICES][MAX_VERTICES]; // 최단거리 역까지 거치는 노드들을 저장
+int check[MAX_VERTICES];// 한 역으로 가는 역을 표시
 
 //안쓸것같음
 /*
 typedef struct GraphType {
 	int n;	// 정점의 개수
 	element** weight[][]; // 구조체 행렬
-} GraphType;
-
-//int distance[];
-//int found[];		
+} GraphType;	
 */
 
 char *csvLists[20]={"1호선","1지선","2호선","2지선","3호선","4호선",
