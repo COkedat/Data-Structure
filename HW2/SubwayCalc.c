@@ -15,15 +15,18 @@ int IC_Time=0; // 환승 시간 전역변수
 int IC_Cnt=0; // 환승 횟수 전역변수
 const int R=MAX_VERTICES; // 행렬 상수
 const int C=MAX_VERTICES; // 행렬 상수
-int R_tmp=0; // 행렬 전역변수 (삽입용)
-int C_tmp=0; // 행렬 전역변수 (삽입용)
+int R_sav=0; // 행렬 전역변수 (삽입용)
+int C_sav=0; // 행렬 전역변수 (삽입용)
 
-typedef struct sublist{ // 구조체
+int tmp[R][C]; // 임시로 받을 전역행렬
+
+typedef struct sublist{ // 역명 구조체
     char name[30]; // 역명
     char code[10]; // 역 코드
+    int num; // 호선 번호
 } sublist;
 
-typedef struct element{ // 구조체
+typedef struct element{ // 인접행렬 구조체
     //char* name; // 역이름?
     char from[10]; // 출발지
     char to[10]; // 목적지

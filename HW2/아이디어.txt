@@ -29,6 +29,58 @@
 
 환승판정 최소거리 판정돌때 element 구조체[i][j]의 ic의 여부로 검사
 
+구조체에 호선코드를 추가할까?
+
 호선은 파일명 리스트를 돚거하자
+
+
+
+인접행렬 csv 불러올때 for문으로 i ( 0 ~ 17 ) 로 돌린다 (csv 리스트)
+    n호선 구분은 csv 첫줄만 읽어서 cnt하고 cnt-1만큼 i번째 역명리스트를 추가해주면 되겠지?
+    (가능하면 아래꺼랑 합쳐서)
+
+
+인접행렬 csv 불러올때 for문으로 i( 0 ~ 17 ) 로 돌린다 (csv 리스트)
+
+    전역행렬 tmp를 모두 -1 혹은 NULL로 초기화 시킨다
+
+    그리고 for 중첩문 j와 k를 돌려서 (아닌가?)
+        strtok하고 전역행렬에 때려박는다(호선명 제외)
+        ->tmp[j][k]=asdasd
+
+    int R_tmp, C_tmp = R_sav, C_sav;
+    전역행렬의 1행 1열부터 test[R_tmp+1][C_tmp+1]이 -1이 아닐때까지(while)
+        행과 열 을 구조체 배열에 때려박는다 (구조체 배열은 전역변수 R_tmp, C_tmp로 함)
+        ->test[R_tmp][C_tmp].data=ㅇㅇ
+        때려박으면서 출발 도착역명도 넣어줌
+        ->test[R_tmp][C_tmp].from=ㅇㅇ
+        ->test[R_tmp][C_tmp].to=ㅇㅇ
+        IF test[R_tmp][C_tmp+1]가 -1이 아니면
+            C_tmp++
+        ELSE IF test[R_tmp][C_tmp+1]가 -1이면
+            R_tmp++
+            C_tmp=C_sav;
+        ELSE IF test[R_tmp+1][C_tmp+1]가 -1이면
+            R_sav=R_tmp;
+            C_sav=C_tmp;
+            break;
+
+
+
+
+나오고 환승정보(19)를 역코드 비교해가면서 삽입해주고 ic=TRUE함
+
+
+
+최소환승은 어캐하냐
+
+
+735(내방)<->736(이수) = 2분
+
+431(동작)<->432(이수) = 3분
+
+432(이수)<->736(이수) = 8분
+
+근데 환승시간 1~3분은 대체뭐지?
 
 REFtest1을 좀 참고할수있을듯
