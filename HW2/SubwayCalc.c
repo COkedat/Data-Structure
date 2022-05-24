@@ -15,10 +15,8 @@ int IC_Time=0; // 환승 시간 전역변수
 int IC_Cnt=0; // 환승 횟수 전역변수
 const int R=MAX_VERTICES; // 행렬 상수
 const int C=MAX_VERTICES; // 행렬 상수
-int R_sav=0; // 행렬 전역변수 (삽입용)
-int C_sav=0; // 행렬 전역변수 (삽입용)
 
-int tmp[R][C]; // 임시로 받을 전역행렬
+//int tmp[R][C]; // 임시로 받을 전역행렬
 
 typedef struct sublist{ // 역명 구조체
     char name[30]; // 역명
@@ -57,7 +55,7 @@ element** makeArray(){
     element **arr = malloc(sizeof(element *) * R);   // 이중 포인터에 (element 포인터 크기 * row)만큼 동적 메모리 할당. 배열의 세로
     for (int i = 0; i < R; i++)            // 세로 크기만큼 반복
     {
-        arr[i] =malloc(sizeof(element) * C);    // (int의 크기 * col)만큼 동적 메모리 할당. 배열의 가로
+        arr[i] =malloc(sizeof(element) * C);    // (element의 크기 * col)만큼 동적 메모리 할당. 배열의 가로
     }
     return arr;
 }
@@ -65,10 +63,10 @@ element** makeArray(){
 void initArray(element** arr){
     for (int i = 0; i < R; i++){
         for (int j = 0; j < C; j++){
-                strcpy(arr[i][j].from,"");
-                strcpy(arr[i][j].to,"");
-                arr[i][j].data=9999;
-                arr[i][j].ic=FALSE;
+                strcpy(arr[i][j].from,""); // 출발지 비움
+                strcpy(arr[i][j].to,""); // 목적지 비움
+                arr[i][j].data=9999; // 가중치 9999로 초기화
+                arr[i][j].ic=FALSE; // 환승 X로 초기화
             }
     }
 }
@@ -81,52 +79,102 @@ void killArray(element** arr){
     free(arr);
 }
 
-element makeElement(){
 
-}
-
-void readCSV(int i){
-    char buf[2048];
-    char fileDir[50]="./data/";
-
-    strcat(fileDir,csvLists[i]);
-    strcat(fileDir,".csv");
-    
-    printf("%s \n",fileDir);
-
-    FILE* stream=NULL;
-    setlocale(LC_ALL, "UTF-8");
-    stream=fopen(fileDir,"r");
-
-    if( stream != NULL ){   
-        while( fgets( buf, 2048, stream )!=NULL ){ 
-            fgets( buf, 2048, stream );          
-            printf("%s\n", buf );             
+FILE* readCSV(int i){
+        char fileDir[50] = "./data/";
+        strcat(fileDir, csvLists[i]);
+        strcat(fileDir, ".csv");
+        printf("%s \n", fileDir);
+        FILE *stream = fopen(fileDir, "r");
+        if (stream != NULL){
+            return stream;
         }
-	} 
-    else{
-        printf("Failed to load %s !!!",fileDir);
-    }
-    fclose(stream);
+        else{
+            printf("Failed to load %s !!!", fileDir);
+            exit(1);
+        }
 }
 
+void readSubArray(element** arr,sublist subinfo[]){
+    int cRow=0;
+    for (int i = 0; i < 18; i++){
+        char buf[2048];
 
+        FILE *stream = readCSV(i);
+        char *line, *tmp;
+        line = fgets(buf, 2048, stream); // 한줄 미리 읽음 (안쓰는 칸 거르기)
+        int tmpR = 0, tmpC = 0;
+        while ((line = fgets(buf, 2048, stream)) != NULL){
+            tmpC = 0;
+            tmp = strtok(line, ",");
+            tmp = strtok(NULL, ",");
+            while (tmp != NULL){
+                subinfo[cRow + tmpR].num=i;
+                arr[cRow + tmpR][cRow + tmpC].data = atoi(tmp);
+                tmp = strtok(NULL, ",");
+                tmpC++;
+            }
+            tmpR++;
+        }
+        cRow = cRow + tmpR;
+        fclose(stream);
+    }
+}
 
-//해야할거) 구조체 행렬 제작하기
+void readSubInfo(sublist subinfo[]){
+        char buf[2048];
+        FILE *stream = readCSV(18);
+        char *line, *tmp;
+        line = fgets(buf, 2048, stream); // 한줄 미리 읽음 (안쓰는 칸 거르기)
+        int idx=0;
+        while ((line = fgets(buf, 2048, stream))!=NULL) {
+            int i=0;
+            tmp = strtok(buf, ","); //
+            while (tmp != NULL){
+                if (i == 0){
+                    strcpy(subinfo[idx].code, tmp);
+                }
+                else if (i == 1){
+                    if(idx!=R-1) // 마지막줄이 아니면
+                        tmp[strlen(tmp) - 1] = '\0'; // \n을 제거해준다.
+                    strcpy(subinfo[idx].name, tmp);
+                }
+                i++;
+                tmp = strtok(NULL, "");
+            }
+            idx++;
+        }
+
+        fclose(stream);
+}
+
 
 
 int main(){
-    printf("pootis \n");
-    readCSV(18);
-
+    printf("Start \n");
     element** test= makeArray();
     initArray(test);
-    strcpy(test[0][0].from,"아싸좋아요");
-    printf("%s \n",test[0][0].from);
-    //printf("%d",test[0][0].data);
+    
+    sublist subinfo[R];
+
+    readSubInfo(subinfo);
+    readSubArray(test,subinfo);
+    int debug=1;
+    if (debug==1){
+        for(int i=0;i<R;i++){
+            for (int j = 0; j < R; j++){
+                if(test[i][j].data!=9999)
+                    printf("[%d %d] : %d \n", i,j,test[i][j].data);
+            }
+        }
+        printf("%s \n",test[0][0].from);
+        printf("%s - %s (%s)\n",subinfo[541].code,subinfo[541].name,csvLists[subinfo[541].num]);
+    }
 
     //system("PAUSE");
     killArray(test);
-    printf("sus \n");
+
+    printf("End \n");
+    system("pause");
     return 0;
 }
