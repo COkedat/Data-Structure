@@ -83,18 +83,15 @@ void print_path(int start, int end){
 
 	printf("°æ·Î: ");
 	int i = end;
-	char tmp[10]="";
-	char yes[1000]="";
+	int k = 0;
+	int way[NODES];
 	while (path[i] != -1){
-		//printf("<%d - %d> ", i, path[i]);
-		sprintf(tmp, ">%d - %d< ", i,path[i]);
+		way[k++]=i;
+		way[k++]=path[i];
 		i = path[i];
-		strcat(&yes,&tmp);
 	}
-	int k = strlen(&yes);
-	for (int q = k - 1; q >= 0; q--)
-	{
-		printf("%c", yes[q]);
+	for(int q = k - 1; q > 0; q=q-2){
+		printf("<%d->%d> ", way[q],way[q-1]);
 	}
 	printf("\n");
 }
