@@ -1,11 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>
+#include <string.h>
 
 #define TRUE 1
 #define FALSE 0
 #define MAX_VERTICES	100	
 #define INF	1000000	/* 무한대 (연결이 없는 경우) */
+#define NODES 7 //
+int path[NODES];
 
 typedef struct GraphType {
 	int n;	// 정점의 개수
@@ -52,7 +55,10 @@ void shortest_path(GraphType* g, int start)
 	{
 		distance[i] = g->weight[start][i];
 		found[i] = FALSE;
+		path[i] = start;
 	}
+	path[start] = -1;
+
 	found[start] = TRUE;    /* 시작 정점 방문 표시 */
 	distance[start] = 0;
 	for (i = 0; i<g->n-1; i++) {
@@ -61,13 +67,41 @@ void shortest_path(GraphType* g, int start)
 		found[u] = TRUE;
 		for (w = 0; w<g->n; w++)
 			if (!found[w])
-				if (distance[u] + g->weight[u][w]<distance[w])
+				if (distance[u] + g->weight[u][w] < distance[w]){
+					path[w]=u;
 					distance[w] = distance[u] + g->weight[u][w];
+				}
 	}
 }
+
+void print_path(int start, int end){
+	/*
+	for (int q = 0; q < NODES; q++){
+		printf("%d : %d \n", q, path[q]);
+	}
+	*/
+
+	printf("경로: ");
+	int i = end;
+	char tmp[10]="";
+	char yes[1000]="";
+	while (path[i] != -1){
+		//printf("<%d - %d> ", i, path[i]);
+		sprintf(tmp, ">%d - %d< ", i,path[i]);
+		i = path[i];
+		strcat(&yes,&tmp);
+	}
+	int k = strlen(&yes);
+	for (int q = k - 1; q >= 0; q--)
+	{
+		printf("%c", yes[q]);
+	}
+	printf("\n");
+}
+
 int main(void)
 {
-	GraphType g = { 7,
+	GraphType g = { NODES,
 	{{ 0,  7,  INF, INF,   3,  10, INF },
 	{ 7,  0,    4,  10,   2,   6, INF },
 	{ INF,  4,    0,   2, INF, INF, INF },
@@ -76,6 +110,8 @@ int main(void)
 	{ 10,  6,  INF,   9, INF,   0, INF },
 	{ INF, INF, INF,   4,   5, INF,   0 } }
 	};
+	
 	shortest_path(&g, 0);
+	print_path(0, 3);
 	return 0;
 }
