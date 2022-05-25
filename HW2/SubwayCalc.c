@@ -84,7 +84,7 @@ FILE* readCSV(int i){
         char fileDir[50] = "./data/";
         strcat(fileDir, csvLists[i]);
         strcat(fileDir, ".csv");
-        printf("%s \n", fileDir);
+        //printf("%s \n", fileDir);
         FILE *stream = fopen(fileDir, "r");
         if (stream != NULL){
             return stream;
@@ -119,6 +119,10 @@ void readSubArray(element** arr,sublist subinfo[]){
         cRow = cRow + tmpR;
         fclose(stream);
     }
+    //여기에 환승정보입력해야하는데 어떻게하냐 ㅋㅋ
+    //FILE *stream = readCSV(19);
+
+
 }
 
 void readSubInfo(sublist subinfo[]){
@@ -150,6 +154,7 @@ void readSubInfo(sublist subinfo[]){
 
 
 
+
 int main(){
     printf("Start \n");
     element** test= makeArray();
@@ -159,16 +164,21 @@ int main(){
 
     readSubInfo(subinfo);
     readSubArray(test,subinfo);
+
     int debug=1;
     if (debug==1){
+        /*
         for(int i=0;i<R;i++){
             for (int j = 0; j < R; j++){
                 if(test[i][j].data!=9999)
                     printf("[%d %d] : %d \n", i,j,test[i][j].data);
             }
+        }*/
+        for(int i=0;i<R;i++){
+            printf("%d) %s - %s (%s)\n",i,subinfo[i].code,subinfo[i].name,csvLists[subinfo[i].num]);
         }
+
         printf("%s \n",test[0][0].from);
-        printf("%s - %s (%s)\n",subinfo[541].code,subinfo[541].name,csvLists[subinfo[541].num]);
     }
 
     //system("PAUSE");
