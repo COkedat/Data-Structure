@@ -123,6 +123,14 @@ void readSubArray(element** arr,sublist subinfo[]){
         fclose(stream);
     }
 
+    //여기서부터는 구조체의 from to 저장
+    for (int i = 0; i < R; i++){
+        for (int j = 0; j < R; j++){
+            strcpy(arr[i][j].from,subinfo[i].code);
+            strcpy(arr[i][j].to,subinfo[j].code);
+        }
+    }
+    /*
     //여기서부터는 환승하는 인덱스 저장
     FILE *stream = readCSV(19);
     int tmpCnt = 0;
@@ -172,7 +180,8 @@ void readSubArray(element** arr,sublist subinfo[]){
         //if (i<IC)
             i++;
     }
-    fclose(stream);
+    
+    fclose(stream);*/
     
 }
 
@@ -216,7 +225,7 @@ int main(){
     readSubInfo(subinfo);
     readSubArray(test,subinfo);
 
-    int debug=0;
+    int debug=1;
     if (debug==1){
         
         for(int i=0;i<R;i++){
@@ -224,13 +233,11 @@ int main(){
                 if(test[i][j].data!=9999&&test[i][j].data!=0){
                     if(test[i][j].ic==TRUE){
                         printf("[%d -> %d] : %d ", i,j,test[i][j].data);
-                        printf("[%s (%s) -> %s (%s)] 환승\n", subinfo[i],csvLists[subinfo[i].num],subinfo[j],csvLists[subinfo[j].num]);
+                        printf("[%s (%s) -> %s (%s)] 환승\n", test[i][j].from,csvLists[subinfo[i].num],test[i][j].to,csvLists[subinfo[j].num]);
                     }
                     else{
-                        /*
                         printf("[%d -> %d] : %d ", i,j,test[i][j].data);
-                        printf("[%s -> %s]\n", subinfo[i],subinfo[j]);
-                        */
+                        printf("[%s -> %s]\n", test[i][j].from,test[i][j].to);
                     }
                 }
             }
@@ -239,9 +246,39 @@ int main(){
         for(int i=0;i<R;i++){
             printf("%d) %s - %s (%s)\n",i,subinfo[i].code,subinfo[i].name,csvLists[subinfo[i].num]);
         }*/
-
-        printf("%s \n",test[0][0].from);
     }
+    int ok=FALSE;
+    char sub1[100];
+    char sub2[100];
+    while(ok!=TRUE){
+        printf("출발역을 입력해주세요: ");
+        fgets(sub1,sizeof(sub1),stdin); //입력
+        int len1 = strlen(sub1);
+        if (sub1[len1 - 1] == '\n'){
+		    sub1[len1 - 1] = '\0'; //문자열에서 \n제거
+	    }
+	    else{ //이상 길은 경우는 아직 입력버퍼에 \n이 남아있음
+		    while (getchar() != '\n'); //입력버퍼에서 \n제거
+	    }
+        printf("도착역을 입력해주세요: ");
+        fgets(sub2,sizeof(sub2),stdin); //입력
+        int len2 = strlen(sub1);
+        if (sub2[len2 - 1] == '\n'){
+		    sub2[len2 - 1] = '\0'; //문자열에서 \n제거
+	    }
+	    else{ //이상 길은 경우는 아직 입력버퍼에 \n이 남아있음
+		    while (getchar() != '\n'); //입력버퍼에서 \n제거
+	    }
+        if(strcmp(sub1,sub2)==0){
+            printf("출발역과 도착역이 동일합니다! \n");
+            printf("다시 입력해주세요! \n");
+            continue;
+        }
+        ok=TRUE;
+
+
+    }
+
 
     //system("PAUSE");
     killArray(test);
