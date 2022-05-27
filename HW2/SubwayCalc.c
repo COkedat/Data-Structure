@@ -15,6 +15,7 @@ int IC_Time=0; // 환승 시간 전역변수
 int IC_Cnt=0; // 환승 횟수 전역변수
 const int R=MAX_VERTICES; // 행렬 상수
 const int C=MAX_VERTICES; // 행렬 상수
+const int IC=145; // 환승역 개수 상수
 
 //int tmp[R][C]; // 임시로 받을 전역행렬
 
@@ -97,9 +98,11 @@ FILE* readCSV(int i){
 
 void readSubArray(element** arr,sublist subinfo[]){
     int cRow=0;
-    for (int i = 0; i < 18; i++){
-        char buf[2048];
+    char *tmp, *line;
+    char buf[2048];
 
+    //인접행렬 정보 입력
+    for (int i = 0; i < 18; i++){
         FILE *stream = readCSV(i);
         char *line, *tmp;
         line = fgets(buf, 2048, stream); // 한줄 미리 읽음 (안쓰는 칸 거르기)
@@ -119,10 +122,58 @@ void readSubArray(element** arr,sublist subinfo[]){
         cRow = cRow + tmpR;
         fclose(stream);
     }
-    //여기에 환승정보입력해야하는데 어떻게하냐 ㅋㅋ
-    //FILE *stream = readCSV(19);
 
+    //여기서부터는 환승하는 인덱스 저장
+    FILE *stream = readCSV(19);
+    int tmpCnt = 0;
+    int tmpIC[IC];
+    line = fgets(buf, 2048, stream);
+    tmp = strtok(line, ",");
+    //tmp = strtok(NULL, ","); //환승 단어 스킵
+    while (tmp != NULL){
+        if(tmpCnt==IC-1) // 마지막 단어면
+                tmp[strlen(tmp) - 1] = '\0'; // \n을 제거해준다.
+        for (int i = 0; i < R; i++){
+            if (strcmp(tmp, subinfo[i].code) == 0){
+                tmpIC[tmpCnt] = i;
+                printf("%d) %s %d 인덱스 [%s]\n", tmpCnt,tmp,i,subinfo[i].name);
+                tmpCnt++;
+            }
+        }
+        tmp = strtok(NULL, ",");
+    }
 
+    //여기서부터는 환승정보를 인접행렬에 저장
+    tmpCnt=0;
+    int m;
+    int n;
+    int i=0;
+    int j=0;
+    //int tmpMtx[IC][IC];
+    while ((line = fgets(buf, 2048, stream)) != NULL){
+        j=0;
+        tmp = strtok(line, ",");
+        tmp = strtok(NULL, ",");
+        while (tmp != NULL){
+            if(j==IC-1) // 마지막 단어면
+                tmp[strlen(tmp) - 1] = '\0'; // \n을 제거해준다.
+            m = tmpIC[i];
+            n = tmpIC[j];
+            if (atoi(tmp) != 9999){
+                printf("%d(%s), ",n,subinfo[n].name);
+                arr[m][n].data = atoi(tmp);
+                arr[m][n].ic = TRUE;
+            }
+            if (j<IC)
+                j++;
+            tmp = strtok(NULL, ",");
+        }
+        printf("[%d:%s]\n",m,subinfo[m].name);
+        //if (i<IC)
+            i++;
+    }
+    fclose(stream);
+    
 }
 
 void readSubInfo(sublist subinfo[]){
@@ -165,18 +216,29 @@ int main(){
     readSubInfo(subinfo);
     readSubArray(test,subinfo);
 
-    int debug=1;
+    int debug=0;
     if (debug==1){
-        /*
+        
         for(int i=0;i<R;i++){
             for (int j = 0; j < R; j++){
-                if(test[i][j].data!=9999)
-                    printf("[%d %d] : %d \n", i,j,test[i][j].data);
+                if(test[i][j].data!=9999&&test[i][j].data!=0){
+                    if(test[i][j].ic==TRUE){
+                        printf("[%d -> %d] : %d ", i,j,test[i][j].data);
+                        printf("[%s (%s) -> %s (%s)] 환승\n", subinfo[i],csvLists[subinfo[i].num],subinfo[j],csvLists[subinfo[j].num]);
+                    }
+                    else{
+                        /*
+                        printf("[%d -> %d] : %d ", i,j,test[i][j].data);
+                        printf("[%s -> %s]\n", subinfo[i],subinfo[j]);
+                        */
+                    }
+                }
             }
-        }*/
+        }
+        /*
         for(int i=0;i<R;i++){
             printf("%d) %s - %s (%s)\n",i,subinfo[i].code,subinfo[i].name,csvLists[subinfo[i].num]);
-        }
+        }*/
 
         printf("%s \n",test[0][0].from);
     }
@@ -185,6 +247,6 @@ int main(){
     killArray(test);
 
     printf("End \n");
-    system("pause");
+    //system("pause");
     return 0;
 }

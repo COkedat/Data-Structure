@@ -42,30 +42,14 @@
 
 인접행렬 csv 불러올때 for문으로 i( 0 ~ 17 ) 로 돌린다 (csv 리스트)
 
-    전역행렬 tmp를 모두 -1 혹은 NULL로 초기화 시킨다
+    
     cnt=0;
     그리고 while (!peof) 
         cnt++
 	    for k를 돌려서 (아닌가?) k=cnt?
-        	strtok하고 전역행렬에 때려박는다(호선명 제외)
+        	strtok하고 인접행렬에 때려박는다(호선명 제외)
             	->tmp[j][k]=asdasd
 
-    int R_tmp, C_tmp = R_sav, C_sav;
-    전역행렬의 1행 1열부터 test[R_tmp+1][C_tmp+1]이 -1이 아닐때까지(while)  -> [혹은 (k-1)+R_sav for문 중첩]
-        행과 열 을 구조체 행렬에 때려박는다 (구조체 배열은 전역변수 R_tmp, C_tmp로 함)
-        ->test[R_tmp][C_tmp].data=가중치값
-        때려박으면서 출발 도착역명도 넣어줌
-        ->test[R_tmp][C_tmp].from=ㅇㅇ
-        ->test[R_tmp][C_tmp].to=ㅇㅇ
-        IF test[R_tmp][C_tmp+1]가 -1이 아니면
-            C_tmp++
-        ELSE IF test[R_tmp][C_tmp+1]가 -1이면
-            R_tmp++
-            C_tmp=C_sav;
-        ELSE IF test[R_tmp+1][C_tmp+1]가 -1이면
-            R_sav=R_tmp;
-            C_sav=C_tmp;
-            break;
 
 
 
