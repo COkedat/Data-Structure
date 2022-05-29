@@ -35,16 +35,9 @@ typedef struct element{ // 인접행렬 구조체
 
 int distance[MAX_VERTICES]; //시작 역으로부터의 최단 경로 거리
 int found[MAX_VERTICES]; // 방문한 역 표시
-int path[MAX_VERTICES][MAX_VERTICES]; // 최단거리 역까지 거치는 노드들을 저장
+int path[MAX_VERTICES]; // 최단거리 역까지 거치는 노드들을 저장
 int check[MAX_VERTICES];// 한 역으로 가는 역을 표시
 
-//안쓸것같음
-/*
-typedef struct GraphType {
-	int n;	// 정점의 개수
-	element** weight[][]; // 구조체 행렬
-} GraphType;	
-*/
 
 char *csvLists[20]={"1호선","1지선","2호선","2지선","3호선","4호선",
                     "5호선","5지선","6호선","7호선","8호선","9호선",
@@ -212,32 +205,75 @@ void readSubInfo(sublist subinfo[]){
         fclose(stream);
 }
 
+int choose(int distance[], int n, int found[])
+{
+	int i, min, minpos;
+	min = INT_MAX;
+	minpos = -1;
+	for (i = 0; i<n; i++)
+		if (distance[i]< min && !found[i]) {
+			min = distance[i];
+			minpos = i;
+		}
+	return minpos;
+}
 
+void shortest_path(element** arr, int start)
+{
+	int i, u, w;
+	for (i = 0; i<R; i++) /* 초기화 */
+	{
+		distance[i] = arr[start][i].data;
+		found[i] = FALSE;
+		path[i] = start;
+	}
+	path[start] = -1;
 
+	found[start] = TRUE;    /* 시작 정점 방문 표시 */
+	distance[start] = 0;
+	for (i = 0; i<R-1; i++) {
+		u = choose(distance, R, found);
+		found[u] = TRUE;
+		for (w = 0; w<R; w++)
+			if (!found[w])
+				if (distance[u] + arr[u][w].data < distance[w]){
+					path[w]=u; //인덱스 저장
+					distance[w] = distance[u] + arr[u][w].data;
+				}
+	}
+}
+
+int subChk(sublist subinfo[],char chk[]){
+    for (int i=0;i<R;i++){
+        if (strcmp(chk,subinfo[i].name)==0)
+            return i;
+    }
+    return -1;
+}
 
 int main(){
-    printf("Start \n");
-    element** test= makeArray();
-    initArray(test);
+    printf("프로그램 시작 \n");
+    element** subarray= makeArray();
+    initArray(subarray);
     
     sublist subinfo[R];
 
     readSubInfo(subinfo);
-    readSubArray(test,subinfo);
+    readSubArray(subarray,subinfo);
 
-    int debug=1;
+    int debug=0;
     if (debug==1){
         
         for(int i=0;i<R;i++){
             for (int j = 0; j < R; j++){
-                if(test[i][j].data!=9999&&test[i][j].data!=0){
-                    if(test[i][j].ic==TRUE){
-                        printf("[%d -> %d] : %d ", i,j,test[i][j].data);
-                        printf("[%s (%s) -> %s (%s)] 환승\n", test[i][j].from,csvLists[subinfo[i].num],test[i][j].to,csvLists[subinfo[j].num]);
+                if(subarray[i][j].data!=9999&&subarray[i][j].data!=0){
+                    if(subarray[i][j].ic==TRUE){
+                        printf("[%d -> %d] : %d ", i,j,subarray[i][j].data);
+                        printf("[%s (%s) -> %s (%s)] 환승\n", subarray[i][j].from,csvLists[subinfo[i].num],subarray[i][j].to,csvLists[subinfo[j].num]);
                     }
                     else{
-                        printf("[%d -> %d] : %d ", i,j,test[i][j].data);
-                        printf("[%s -> %s]\n", test[i][j].from,test[i][j].to);
+                        printf("[%d -> %d] : %d ", i,j,subarray[i][j].data);
+                        printf("[%s -> %s]\n", subarray[i][j].from,subarray[i][j].to);
                     }
                 }
             }
@@ -252,38 +288,35 @@ int main(){
     char sub2[100];
     while(ok!=TRUE){
         printf("출발역을 입력해주세요: ");
-        fgets(sub1,sizeof(sub1),stdin); //입력
-        int len1 = strlen(sub1);
-        if (sub1[len1 - 1] == '\n'){
-		    sub1[len1 - 1] = '\0'; //문자열에서 \n제거
-	    }
-	    else{ //이상 길은 경우는 아직 입력버퍼에 \n이 남아있음
-		    while (getchar() != '\n'); //입력버퍼에서 \n제거
-	    }
+        fgets(sub1,sizeof(sub1),stdin); //출발역 입력
+        //sub1이 비어있지 않고 0번째가 \0이 아니면서 끝부분이 \n일경우
+        if(sub1 !=NULL && sub1[0]!='\0' && sub1[strlen(sub1)-1]=='\n')
+            sub1[strlen(sub1)-1]='\0';
+
         printf("도착역을 입력해주세요: ");
-        fgets(sub2,sizeof(sub2),stdin); //입력
-        int len2 = strlen(sub1);
-        if (sub2[len2 - 1] == '\n'){
-		    sub2[len2 - 1] = '\0'; //문자열에서 \n제거
-	    }
-	    else{ //이상 길은 경우는 아직 입력버퍼에 \n이 남아있음
-		    while (getchar() != '\n'); //입력버퍼에서 \n제거
-	    }
+        fgets(sub2,sizeof(sub2),stdin); //도착역 입력 
+        //sub2가 비어있지 않고 0번째가 \0이 아니면서 끝부분이 \n일경우
+        if(sub2 !=NULL && sub2[0]!='\0' && sub2[strlen(sub2)-1]=='\n') 
+            sub2[strlen(sub2)-1]='\0';
+
         if(strcmp(sub1,sub2)==0){
             printf("출발역과 도착역이 동일합니다! \n");
             printf("다시 입력해주세요! \n");
             continue;
         }
+        int sub1_idx=subChk(subinfo,sub1);
+        int sub2_idx=subChk(subinfo,sub2);
+        if (sub1_idx==-1||sub2_idx==-1){
+            printf("출발역또는 도착역이 정확하지 않습니다! \n");
+            printf("다시 입력해주세요! \n");
+            continue;
+        }
+        printf("[%s (%s) -> %s (%s)] \n", subinfo[sub1_idx].name,csvLists[subinfo[sub1_idx].num],subinfo[sub2_idx].name,csvLists[subinfo[sub2_idx].num]);
         ok=TRUE;
-
-
     }
 
+    killArray(subarray);
+    printf("프로그램 종료 \n");
 
-    //system("PAUSE");
-    killArray(test);
-
-    printf("End \n");
-    //system("pause");
     return 0;
 }
