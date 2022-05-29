@@ -206,8 +206,7 @@ void readSubInfo(sublist subinfo[]){
         fclose(stream);
 }
 
-int choose(int distance[], int n, int found[])
-{
+int choose(int distance[], int n, int found[]){
 	int i, min, minpos;
 	min = INT_MAX;
 	minpos = -1;
@@ -219,11 +218,9 @@ int choose(int distance[], int n, int found[])
 	return minpos;
 }
 
-void shortest_path(element** arr, int start)
-{
+void shortest_path(element** arr, int start){
 	int i, u, w;
-	for (i = 0; i<R; i++) /* 초기화 */
-	{
+	for (i = 0; i<R; i++){  /* 초기화 */
 		distance[i] = arr[start][i].data;
 		found[i] = FALSE;
 		path[i] = start;
@@ -253,12 +250,7 @@ int subChk(sublist subinfo[],char chk[]){
 }
 
 void print_path(int start, int end,sublist subinfo[],element** arr){
-	/*
-	for (int q = 0; q < NODES; q++){
-		printf("%d : %d \n", q, path[q]);
-	}
-	*/
-
+    
 	printf("<출발>\n");
 	int i = end;
 	int k = 0;
