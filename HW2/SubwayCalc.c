@@ -42,15 +42,14 @@ int check[MAX_VERTICES];// 한 역으로 가는 역을 표시
 
 char *csvLists[20]={"1호선","1지선","2호선","2지선","3호선","4호선",
                     "5호선","5지선","6호선","7호선","8호선","9호선",
-                    "분당선","인천1선","중앙선","경춘선","경의선","공항철도","역이름","환승정보"};
+                    "분당선","인천1선","중앙선","경춘선","경의선","공항철도","역이름","환승정보"}; //역 파일명 모음
 
 
 
 element** makeArray(){
     element **arr = malloc(sizeof(element *) * R);   // 이중 포인터에 (element 포인터 크기 * row)만큼 동적 메모리 할당. 배열의 세로
-    for (int i = 0; i < R; i++)            // 세로 크기만큼 반복
-    {
-        arr[i] =malloc(sizeof(element) * C);    // (element의 크기 * col)만큼 동적 메모리 할당. 배열의 가로
+    for (int i = 0; i < R; i++){            // 세로 크기만큼 반복
+        arr[i] = malloc(sizeof(element) * C);    // (element의 크기 * col)만큼 동적 메모리 할당. 배열의 가로
     }
     return arr;
 }
@@ -76,52 +75,51 @@ void killArray(element** arr){
 
 
 FILE* readCSV(int i){
-        char fileDir[50] = "./data/";
-        strcat(fileDir, csvLists[i]);
-        strcat(fileDir, ".csv");
-        //printf("%s \n", fileDir);
-        FILE *stream = fopen(fileDir, "r");
-        if (stream != NULL){
+        char fileDir[50] = "./data/"; // 하위 경로
+        strcat(fileDir, csvLists[i]); // i번째 파일명을 하위 경로에 붙임
+        strcat(fileDir, ".csv"); // .csv를 하위 경로에 붙임
+        FILE *stream = fopen(fileDir, "r"); // 하위 경로의 파일을 불러옴
+        if (stream != NULL){ //파일이 비어있지 않으면
             return stream;
         }
-        else{
-            printf("Failed to load %s !!!", fileDir);
-            exit(1);
+        else{ //파일이 비어있거나 문제가 있다면
+            printf("Failed to load %s !!!", fileDir); //오류 출력
+            exit(1); //종료
         }
 }
 
 void readSubArray(element** arr,sublist subinfo[]){
-    int cRow=0;
-    char *tmp, *line;
-    char buf[2048];
+    int cRow=0; // 현재 행열 값을 저장하는 벼수
+    char *tmp, *line; //줄과 단어 변수 선언
+    char buf[2048]; // 버퍼 선언
 
     //인접행렬 정보 입력
     for (int i = 0; i < 18; i++){
         FILE *stream = readCSV(i);
         char *line, *tmp;
         line = fgets(buf, 2048, stream); // 한줄 미리 읽음 (안쓰는 칸 거르기)
-        int tmpR = 0, tmpC = 0;
-        while ((line = fgets(buf, 2048, stream)) != NULL){
-            tmpC = 0;
-            tmp = strtok(line, ",");
-            tmp = strtok(NULL, ",");
-            while (tmp != NULL){
-                subinfo[cRow + tmpR].num=i;
-                arr[cRow + tmpR][cRow + tmpC].data = atoi(tmp);
-                tmp = strtok(NULL, ",");
-                tmpC++;
+        int tmpR = 0, tmpC = 0; //임시 행 열
+        while ((line = fgets(buf, 2048, stream)) != NULL){ //한줄씩 읽음
+            tmpC = 0; //임시 열을 0으로 초기화
+            tmp = strtok(line, ","); // ,로 나눠진 line의 첫 단어를 읽음
+            tmp = strtok(NULL, ","); //다음 단어를 읽음 ( 첫번째 역 코드 뛰어넘기 )
+            while (tmp != NULL){ // 읽은 단어가 NULL이 아니면
+                subinfo[cRow + tmpR].num=i; // ~호선 인덱스를 역명 구조체에 저장
+                arr[cRow + tmpR][cRow + tmpC].data = atoi(tmp); // 인접행렬 구조체에 cRow + tmpR,C의 인덱스에 해당 값 저장
+                tmp = strtok(NULL, ","); //다음 단어를 읽음
+                tmpC++; // 임시 열 추가
             }
-            tmpR++;
+            tmpR++; // 임시행 추가
         }
-        cRow = cRow + tmpR;
-        fclose(stream);
+        cRow = cRow + tmpR; // 현재 열에 임시 행만큼 더해줘서 저장
+        fclose(stream); //파일 닫기
     }
 
     //여기서부터는 구조체의 from to 저장
     for (int i = 0; i < R; i++){
         for (int j = 0; j < R; j++){
-            strcpy(arr[i][j].from,subinfo[i].code);
-            strcpy(arr[i][j].to,subinfo[j].code);
+            strcpy(arr[i][j].from,subinfo[i].code); //arr의 i행에 출발 역코드 저장
+            strcpy(arr[i][j].to,subinfo[j].code); //arr의 j행에 도착 역코드 저장
         }
     }
     /*
@@ -255,21 +253,27 @@ void print_path(int start, int end,sublist subinfo[],element** arr){
 	int i = end;
 	int k = 0;
 	int way[R];
-	while (path[i] != -1){
+    int IC_rand;
+	while (path[i] != -1){ // -1에 도달할때까지 인덱스들을 저장
 		way[k++]=i;
 		way[k++]=path[i];
 		i = path[i];
 	}
+    printf("(%d분)", Sub_Time);
     printf("-><%s> %s\n", csvLists[subinfo[way[k-1]].num],subinfo[way[k-1]].name);
 	for(int q = k - 1; q > 0; q=q-2){
-        if(arr[q][q-1].ic==0){
+        if(arr[q][q-1].ic==0){ 
+            // 환승이 아닐경우
             Sub_Time+=arr[q][q-1].data;
             Sub_Cnt++;
+            printf("(%d분)", Sub_Time);
             printf("-><%s> %s\n", csvLists[subinfo[way[q-1]].num],subinfo[way[q-1]].name);
         }
         else{
-            IC_Time+=arr[q][q-1].data;
-            printf("-><환승 : 소요시간 %d 분> %s\n", arr[q][q-1].data,subinfo[way[q-1]].name);
+            // 환승일 경우 
+            IC_rand=(rand() % arr[q][q-1].data) + 1; // 1~해당 값까지로 랜덤화
+            IC_Time+=IC_rand; 
+            printf("-><환승 : 소요시간 %d 분> %s\n", IC_rand,subinfo[way[q-1]].name);
         }
 	}
 	printf("\n\n");
@@ -345,7 +349,7 @@ int main(){
     }
 
     shortest_path(subarray, sub1_idx);
-	print_path(sub1_idx, sub2_idx, subinfo,subarray);
+	print_path(sub1_idx, sub2_idx, subinfo, subarray);
 
     killArray(subarray);
     printf("프로그램 종료 \n");
