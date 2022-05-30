@@ -252,6 +252,7 @@ void print_path(int start, int end,sublist subinfo[],element** arr){
 	printf("<출발>\n");
 	int i = end;
 	int k = 0;
+    int limit = 0;
 	int way[R];
     int IC_rand;
 	while (path[i] != -1){ // -1에 도달할때까지 인덱스들을 저장
@@ -259,9 +260,11 @@ void print_path(int start, int end,sublist subinfo[],element** arr){
 		way[k++]=path[i];
 		i = path[i];
 	}
+    if(strcmp(subinfo[way[k]].name,subinfo[way[k-1]].name)==0) k-=2; // 출발역과 다음역의 이름이 동일하다면 = 환승이면 한개를 덜 읽게 만든다
+    if(strcmp(subinfo[way[0]].name,subinfo[way[1]].name)==0) limit+=2; // 도착역과 이전역의 이름이 동일하다면 = 환승이면 한개를 덜 읽게 만든다.
     printf("(%d분)", Sub_Time);
     printf("-><%s> %s\n", csvLists[subinfo[way[k-1]].num],subinfo[way[k-1]].name);
-	for(int q = k - 1; q > 0; q=q-2){
+	for(int q = k - 1; q > limit++; q=q-2){
         if(arr[q][q-1].ic==0){ 
             // 환승이 아닐경우
             Sub_Time+=arr[q][q-1].data;
