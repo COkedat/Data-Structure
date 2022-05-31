@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <locale.h>
+#include <time.h>
 
 #define TRUE 1
 #define FALSE 0
@@ -13,10 +14,11 @@
 int Sub_Time=0; // 이동 시간 전역변수 (환승 시간 제외)
 int Sub_Cnt=0; // 정거장 횟수 전역변수 (환승 시간 제외)
 int IC_Time=0; // 환승 시간 전역변수
-int IC_Cnt=0; // 환승 횟수 전역변수
+int option=1; // 우선방식 여부 전역변수 (1=최단거리, 2=최소환승)
+
 const int R=MAX_VERTICES; // 행렬 상수
 const int C=MAX_VERTICES; // 행렬 상수
-const int IC=145; // 환승역 개수 상수
+const int IC=150; // 환승역 개수 상수
 
 //int tmp[R][C]; // 임시로 받을 전역행렬
 
@@ -34,7 +36,8 @@ typedef struct element{ // 인접행렬 구조체
     int ic; // 환승 여부
 } element;
 
-int distance[MAX_VERTICES]; //시작 역으로부터의 최단 경로 거리
+int distance[MAX_VERTICES]; // 시작 역으로부터의 최단 경로 거리
+int IC_cnt[MAX_VERTICES]; // 시작 역으로부터의 최소 환승 횟수
 int found[MAX_VERTICES]; // 방문한 역 표시
 int path[MAX_VERTICES]; // 최단거리 역까지 거치는 노드들을 저장
 int check[MAX_VERTICES];// 한 역으로 가는 역을 표시
@@ -92,6 +95,7 @@ void readSubArray(element** arr,sublist subinfo[]){
     int cRow=0; // 현재 행열 값을 저장하는 벼수
     char *tmp, *line; //줄과 단어 변수 선언
     char buf[2048]; // 버퍼 선언
+    srand(time(NULL));
 
     //인접행렬 정보 입력
     for (int i = 0; i < 18; i++){
@@ -122,7 +126,7 @@ void readSubArray(element** arr,sublist subinfo[]){
             strcpy(arr[i][j].to,subinfo[j].code); //arr의 j행에 도착 역코드 저장
         }
     }
-    /*
+    
     //여기서부터는 환승하는 인덱스 저장
     FILE *stream = readCSV(19);
     int tmpCnt = 0;
@@ -136,7 +140,7 @@ void readSubArray(element** arr,sublist subinfo[]){
         for (int i = 0; i < R; i++){
             if (strcmp(tmp, subinfo[i].code) == 0){
                 tmpIC[tmpCnt] = i;
-                printf("%d) %s %d 인덱스 [%s]\n", tmpCnt,tmp,i,subinfo[i].name);
+                //printf("%d) %s %d 인덱스 [%s]\n", tmpCnt,tmp,i,subinfo[i].name);
                 tmpCnt++;
             }
         }
@@ -160,20 +164,20 @@ void readSubArray(element** arr,sublist subinfo[]){
             m = tmpIC[i];
             n = tmpIC[j];
             if (atoi(tmp) != 9999){
-                printf("%d(%s), ",n,subinfo[n].name);
-                arr[m][n].data = atoi(tmp);
+                //printf("%d(%s), ",n,subinfo[n].name);
+                arr[m][n].data = (rand() % atoi(tmp)) + 1;
                 arr[m][n].ic = TRUE;
             }
             if (j<IC)
                 j++;
             tmp = strtok(NULL, ",");
         }
-        printf("[%d:%s]\n",m,subinfo[m].name);
+        //printf("[%d:%s]\n",m,subinfo[m].name);
         //if (i<IC)
             i++;
     }
     
-    fclose(stream);*/
+    fclose(stream);
     
 }
 
@@ -224,6 +228,14 @@ void shortest_path(element** arr, int start){
 		path[i] = start;
 	}
 	path[start] = -1;
+    if(option==2){ //최소환승일 경우
+        for (i = 0; i<R; i++){
+		    for (int j = 0; j<R; j++){
+                if(arr[i][j].ic==1)// 환승역이면
+                    arr[i][j].data+=1000; //가중치를 크게 증가시킴
+	        }
+	    }
+    }
 
 	found[start] = TRUE;    /* 시작 정점 방문 표시 */
 	distance[start] = 0;
@@ -248,38 +260,42 @@ int subChk(sublist subinfo[],char chk[]){
 }
 
 void print_path(int start, int end,sublist subinfo[],element** arr){
-    
-	printf("<출발>\n");
+    //초기화 단계
+    Sub_Time=0;
+    IC_Time=0;
+    Sub_Cnt=0;
 	int i = end;
 	int k = 0;
     int limit = 0;
 	int way[R];
-    int IC_rand;
+    int IC_Now;
 	while (path[i] != -1){ // -1에 도달할때까지 인덱스들을 저장
-		way[k++]=i;
-		way[k++]=path[i];
-		i = path[i];
+		way[k++]=i; // 인덱스 저장
+		way[k++]=path[i]; // i 다음으로 이어지는 인덱스 저장
+		i = path[i]; // 다음
 	}
-    if(strcmp(subinfo[way[k]].name,subinfo[way[k-1]].name)==0) k-=2; // 출발역과 다음역의 이름이 동일하다면 = 환승이면 한개를 덜 읽게 만든다
-    if(strcmp(subinfo[way[0]].name,subinfo[way[1]].name)==0) limit+=2; // 도착역과 이전역의 이름이 동일하다면 = 환승이면 한개를 덜 읽게 만든다.
+    if(strcmp(subinfo[way[k-1]].name,subinfo[way[k-2]].name)==0) k--; // 출발역과 다음역의 이름이 동일하다면 = 환승이면 한개를 덜 읽게 만든다.
+    if(strcmp(subinfo[way[0]].name,subinfo[way[1]].name)==0) limit+=1; // 도착역과 이전역의 이름이 동일하다면 = 환승이면 한개를 덜 읽게 만든다.
+    printf("<출발>\n");
     printf("(%d분)", Sub_Time);
     printf("-><%s> %s\n", csvLists[subinfo[way[k-1]].num],subinfo[way[k-1]].name);
-	for(int q = k - 1; q > limit++; q=q-2){
-        if(arr[q][q-1].ic==0){ 
+	for(int q = k - 1; q > limit; q=q-2){
+        if(arr[way[q]][way[q-1]].ic==0){ 
             // 환승이 아닐경우
-            Sub_Time+=arr[q][q-1].data;
+            Sub_Time+=arr[way[q]][way[q-1]].data;
             Sub_Cnt++;
             printf("(%d분)", Sub_Time);
             printf("-><%s> %s\n", csvLists[subinfo[way[q-1]].num],subinfo[way[q-1]].name);
         }
         else{
-            // 환승일 경우 
-            IC_rand=(rand() % arr[q][q-1].data) + 1; // 1~해당 값까지로 랜덤화
-            IC_Time+=IC_rand; 
-            printf("-><환승 : 소요시간 %d 분> %s\n", IC_rand,subinfo[way[q-1]].name);
+            // 환승일 경우
+            IC_Now=arr[way[q]][way[q-1]].data;
+            if(option==2) IC_Now=arr[way[q]][way[q-1]].data-1000; // 최소환승일경우 가중치가 더해져 있으므로 1000분 제거
+            IC_Time+=IC_Now;
+            printf("-><환승 : 소요시간 %d 분> %s\n", IC_Now,subinfo[way[q-1]].name);
         }
 	}
-	printf("\n\n");
+	printf("\n");
     printf("소요시간 : %d (%d + 환승 소요시간 %d) 분\n",Sub_Time+IC_Time,Sub_Time,IC_Time);
     printf("정거장 수 : %d 개\n",Sub_Cnt);
 }
@@ -294,10 +310,9 @@ int main(){
 
     readSubInfo(subinfo);
     readSubArray(subarray,subinfo);
-
+    
     int debug=0;
     if (debug==1){
-        
         for(int i=0;i<R;i++){
             for (int j = 0; j < R; j++){
                 if(subarray[i][j].data!=9999&&subarray[i][j].data!=0){
@@ -317,12 +332,13 @@ int main(){
             printf("%d) %s - %s (%s)\n",i,subinfo[i].code,subinfo[i].name,csvLists[subinfo[i].num]);
         }*/
     }
-    int ok=FALSE;
-    char sub1[100];
-    char sub2[100];
-    int sub1_idx;
-    int sub2_idx;
-    while(ok!=TRUE){
+    
+    char sub1[100]; // 출발역 입력
+    char sub2[100]; // 도착역 입력
+    int sub1_idx; // 출발역 인덱스
+    int sub2_idx; // 도착역 인덱스
+
+    while(1){ // 역 이름을 입력하는 부분 
         printf("출발역을 입력해주세요: ");
         fgets(sub1,sizeof(sub1),stdin); //출발역 입력
         //sub1이 비어있지 않고 0번째가 \0이 아니면서 끝부분이 \n일경우
@@ -347,10 +363,35 @@ int main(){
             printf("다시 입력해주세요! \n");
             continue;
         }
-        printf("[%s (%s) -> %s (%s)] \n", subinfo[sub1_idx].name,csvLists[subinfo[sub1_idx].num],subinfo[sub2_idx].name,csvLists[subinfo[sub2_idx].num]);
-        ok=TRUE;
+        break;
+    }
+    while(1){ // 우선 방식을 입력하는 부분 
+        printf("방식? 1. 최단경로 2. 최소환승\n");
+        printf(": ");
+        char Chk_num[5]; // 우선방식 여부
+        fgets(Chk_num,sizeof(Chk_num),stdin); //출발역 입력
+        //sub1이 비어있지 않고 0번째가 \0이 아니면서 끝부분이 \n일경우
+        if(Chk_num !=NULL && Chk_num[0]!='\0' && Chk_num[strlen(Chk_num)-1]=='\n')
+            Chk_num[strlen(Chk_num)-1]='\0';
+
+        if(atoi(Chk_num)!=1&&atoi(Chk_num)!=2){
+            printf("올바르지 않은 값입니다! \n");
+            printf("다시 입력해주세요! \n");
+            continue;
+        }
+        else if(atoi(Chk_num)==1){
+            option=1;
+        }
+        else{
+            option=2;
+        }
+        break;
     }
 
+
+
+
+    printf("[%s -> %s ] \n", subinfo[sub1_idx].name,subinfo[sub2_idx].name);
     shortest_path(subarray, sub1_idx);
 	print_path(sub1_idx, sub2_idx, subinfo, subarray);
 
