@@ -268,13 +268,12 @@ void print_path(int start, int end,sublist subinfo[],element** arr){
 	int k = 0;
     int limit = 0;
 	int way[R];
-    int IC_Now;
+    int Now;
 	while (path[i] != -1){ // -1에 도달할때까지 인덱스들을 저장
 		way[k++]=i; // 인덱스 저장
 		way[k++]=path[i]; // i 다음으로 이어지는 인덱스 저장
 		i = path[i]; // 다음
 	}
-    if(strcmp(subinfo[way[k-1]].name,subinfo[way[k-2]].name)==0) k--; // 출발역과 다음역의 이름이 동일하다면 = 환승이면 한개를 덜 읽게 만든다.
     if(strcmp(subinfo[way[0]].name,subinfo[way[1]].name)==0) limit+=1; // 도착역과 이전역의 이름이 동일하다면 = 환승이면 한개를 덜 읽게 만든다.
     printf("<출발>\n");
     printf("(%d분)", Sub_Time);
@@ -282,17 +281,18 @@ void print_path(int start, int end,sublist subinfo[],element** arr){
 	for(int q = k - 1; q > limit; q=q-2){
         if(arr[way[q]][way[q-1]].ic==0){ 
             // 환승이 아닐경우
-            Sub_Time+=arr[way[q]][way[q-1]].data;
+            Now=arr[way[q]][way[q-1]].data;
+            Sub_Time+=Now;
             Sub_Cnt++;
             printf("(%d분)", Sub_Time);
             printf("-><%s> %s\n", csvLists[subinfo[way[q-1]].num],subinfo[way[q-1]].name);
         }
         else{
             // 환승일 경우
-            IC_Now=arr[way[q]][way[q-1]].data;
-            if(option==2) IC_Now=arr[way[q]][way[q-1]].data-1000; // 최소환승일경우 가중치가 더해져 있으므로 1000분 제거
-            IC_Time+=IC_Now;
-            printf("-><환승 : 소요시간 %d 분> %s\n", IC_Now,subinfo[way[q-1]].name);
+            Now=arr[way[q]][way[q-1]].data;
+            if(option==2) Now=arr[way[q]][way[q-1]].data-1000; // 최소환승일경우 가중치가 더해져 있으므로 1000분 제거
+            IC_Time+=Now;
+            printf("-><환승 : 소요시간 %d 분> %s\n", Now,subinfo[way[q-1]].name);
         }
 	}
 	printf("\n");
@@ -300,6 +300,40 @@ void print_path(int start, int end,sublist subinfo[],element** arr){
     printf("정거장 수 : %d 개\n",Sub_Cnt);
 }
 
+int calc_path(int start, int end,sublist subinfo[],element** arr){
+    //초기화 단계
+    Sub_Time=0;
+    IC_Time=0;
+    Sub_Cnt=0;
+	int i = end;
+	int k = 0;
+    int limit = 0;
+	int way[R];
+    int Now;
+	while (path[i] != -1){ // -1에 도달할때까지 인덱스들을 저장
+		way[k++]=i; // 인덱스 저장
+		way[k++]=path[i]; // i 다음으로 이어지는 인덱스 저장
+		i = path[i]; // 다음
+	}
+    if(strcmp(subinfo[way[0]].name,subinfo[way[1]].name)==0) limit+=1; // 도착역과 이전역의 이름이 동일하다면 = 환승이면 한개를 덜 읽게 만든다.
+	for(int q = k - 1; q > limit; q=q-2){
+        if(arr[way[q]][way[q-1]].ic==0){ 
+            // 환승이 아닐경우
+            Now=arr[way[q]][way[q-1]].data;
+            Sub_Time+=Now;
+            Sub_Cnt++;
+        }
+        else{
+            // 환승일 경우
+            Now=arr[way[q]][way[q-1]].data;
+            if(option==2) Now=arr[way[q]][way[q-1]].data-1000; // 최소환승일경우 가중치가 더해져 있으므로 1000분 제거
+            IC_Time+=Now;
+        }
+	}
+	printf("\n");
+    printf("소요시간 : %d (%d + 환승 소요시간 %d) 분\n",Sub_Time+IC_Time,Sub_Time,IC_Time);
+    return Sub_Time+IC_Time;
+}
 
 int main(){
     printf("프로그램 시작 \n");
@@ -337,6 +371,8 @@ int main(){
     char sub2[100]; // 도착역 입력
     int sub1_idx; // 출발역 인덱스
     int sub2_idx; // 도착역 인덱스
+    int ov_idx[R]; // 출발역 환승 중복 인덱스 저장 배열
+    int curIdx=0; // 출발역 환승 중복 인덱스 배열 인덱스
 
     while(1){ // 역 이름을 입력하는 부분 
         printf("출발역을 입력해주세요: ");
@@ -388,6 +424,13 @@ int main(){
         break;
     }
 
+    int ov_cnt=0;
+    for(int i=0;i<R;i++){
+        if(strcmp(sub1,subinfo[i].name)==0){ //환승이라면
+            ov_cnt++; // 카운트 증가
+            ov_idx[curIdx++]=i; // 해당 인덱스를 저장
+        }
+    }
 
 
 
