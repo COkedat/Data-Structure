@@ -173,7 +173,7 @@ void readSubArray(element** arr,sublist subinfo[]){
             tmp = strtok(NULL, ",");
         }
         //printf("[%d:%s]\n",m,subinfo[m].name);
-        //if (i<IC)
+        if (i<IC-2)
             i++;
     }
     
@@ -345,7 +345,7 @@ int main(){
     readSubInfo(subinfo);
     readSubArray(subarray,subinfo);
     
-    int debug=0;
+    int debug=1;
     if (debug==1){
         for(int i=0;i<R;i++){
             for (int j = 0; j < R; j++){
