@@ -282,7 +282,7 @@ void print_path(int start, int end,sublist subinfo[],element** arr){
 	for(int q = k - 1; q > limit; q=q-2){
         if(arr[way[q]][way[q-1]].ic==0){ 
             // 환승이 아닐경우
-            if(q<3||arr[way[q-2]][way[q-3]].ic==0){ // 쇼트서킷으로 잘못된 참조 방지
+            if(q<4||arr[way[q-2]][way[q-3]].ic==0){ // 쇼트서킷으로 잘못된 참조 방지
                 Now=arr[way[q]][way[q-1]].data;
                 Sub_Time+=Now;
                 //printf("(%d분)", Sub_Time);
@@ -323,7 +323,7 @@ int calc_path(int start, int end,sublist subinfo[],element** arr){
 	for(int q = k - 1; q > limit; q=q-2){
         if(arr[way[q]][way[q-1]].ic==0){ 
             // 환승이 아닐경우
-            if(q<3||arr[way[q-2]][way[q-3]].ic==0){ // 쇼트서킷으로 잘못된 참조 방지
+            if(q<4||arr[way[q-2]][way[q-3]].ic==0){ // 쇼트서킷으로 잘못된 참조 방지
                 Now=arr[way[q]][way[q-1]].data;
                 Sub_Time+=Now;
             }
