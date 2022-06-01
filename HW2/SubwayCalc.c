@@ -48,7 +48,12 @@ char *csvLists[20]={"1호선","1지선","2호선","2지선","3호선","4호선",
                     "분당선","인천1선","중앙선","경춘선","경의선","공항철도","역이름","환승정보"}; //역 파일명 모음
 
 
-
+/*
+* 함수명: makeArray()
+* 인 자 : 없음
+* 리턴형: element**
+* 설 명 : 구조체 배열을 동적 생성하는 함수
+*/
 element** makeArray(){
     element **arr = malloc(sizeof(element *) * R);   // 이중 포인터에 (element 포인터 크기 * row)만큼 동적 메모리 할당. 배열의 세로
     for (int i = 0; i < R; i++){            // 세로 크기만큼 반복
@@ -57,6 +62,13 @@ element** makeArray(){
     return arr;
 }
 
+
+/*
+* 함수명: initArray(arr)
+* 인 자 : element**
+* 리턴형: void
+* 설 명 : 구조체 배열 내부를 초기화하는 함수
+*/
 void initArray(element** arr){
     for (int i = 0; i < R; i++){
         for (int j = 0; j < C; j++){
@@ -67,7 +79,12 @@ void initArray(element** arr){
             }
     }
 }
-
+/*
+* 함수명: killArray(arr)
+* 인 자 : element**
+* 리턴형: void
+* 설 명 : 구조체 배열을 할당 해제하는 함수
+*/
 void killArray(element** arr){
 
     for (int i = 0; i < R; i++) {
@@ -76,7 +93,12 @@ void killArray(element** arr){
     free(arr);
 }
 
-
+/*
+* 함수명: readCSV(i)
+* 인 자 : int
+* 리턴형: FILE*
+* 설 명 : i번째 파일을 읽어서 FILE*로 리턴하는 함수
+*/
 FILE* readCSV(int i){
         char fileDir[50] = "./data/"; // 하위 경로
         strcat(fileDir, csvLists[i]); // i번째 파일명을 하위 경로에 붙임
@@ -91,6 +113,12 @@ FILE* readCSV(int i){
         }
 }
 
+/*
+* 함수명: readSubArray(arr,subinfo[])
+* 인 자 : element** , sublist
+* 리턴형: void
+* 설 명 : 인접행렬 구조체의 정보와 지하철 역명 구조체 정보의 호선 인덱스를 채우는 함수
+*/
 void readSubArray(element** arr,sublist subinfo[]){
     int cRow=0; // 현재 행열 값을 저장하는 벼수
     char *tmp, *line; //줄과 단어 변수 선언
@@ -127,7 +155,7 @@ void readSubArray(element** arr,sublist subinfo[]){
         }
     }
     
-    //여기서부터는 환승하는 인덱스 저장
+    //여기서부터는 환승하는 코드의 인덱스 저장
     FILE *stream = readCSV(19);
     int tmpCnt = 0;
     int tmpIC[IC];
@@ -176,11 +204,15 @@ void readSubArray(element** arr,sublist subinfo[]){
         if (i<IC-2)
             i++;
     }
-    
     fclose(stream);
-    
 }
 
+/*
+* 함수명: readSubInfo(subinfo[])
+* 인 자 : sublist
+* 리턴형: void
+* 설 명 : 지하철 역명 구조체 정보의 역명과 코드를 채우는 함수
+*/
 void readSubInfo(sublist subinfo[]){
         char buf[2048];
         FILE *stream = readCSV(18);
@@ -208,6 +240,12 @@ void readSubInfo(sublist subinfo[]){
         fclose(stream);
 }
 
+/*
+* 함수명: choose(distance[], n, found[])
+* 인 자 : int 3개
+* 리턴형: int
+* 설 명 : 거리가 가장 작은 인덱스를 리턴하는 함수
+*/
 int choose(int distance[], int n, int found[]){
 	int i, min, minpos;
 	min = INT_MAX;
@@ -220,6 +258,12 @@ int choose(int distance[], int n, int found[]){
 	return minpos;
 }
 
+/*
+* 함수명: shortest_path(arr, start)
+* 인 자 : element**, int
+* 리턴형: void
+* 설 명 : 최단거리를 탐색하는 함수
+*/
 void shortest_path(element** arr, int start){
 	int i, u, w;
 	for (i = 0; i<R; i++){  /* 초기화 */
@@ -228,7 +272,7 @@ void shortest_path(element** arr, int start){
 		path[i] = start;
 	}
 	path[start] = -1;
-    if(option==2&&trans_done==0){ //최소환승일 경우
+    if(option==2&&trans_done==0){ //최소환승 옵션일 경우
         for (i = 0; i<R; i++){
 		    for (int j = 0; j<R; j++){
                 if(arr[i][j].ic==1)// 환승역이면
@@ -252,14 +296,26 @@ void shortest_path(element** arr, int start){
 	}
 }
 
+/*
+* 함수명: subChk(subinfo[],chk[])
+* 인 자 : sublist,char
+* 리턴형: int
+* 설 명 : 역명 인덱스를 탐색하는 함수
+*/
 int subChk(sublist subinfo[],char chk[]){
     for (int i=0;i<R;i++){
-        if (strcmp(chk,subinfo[i].name)==0)
-            return i;
+        if (strcmp(chk,subinfo[i].name)==0) //해당하는 문자열을 찾으면
+            return i; //해당 인덱스 출력
     }
     return -1; //목록에 없으면 -1 출력
 }
 
+/*
+* 함수명: print_path(int start, int end,sublist subinfo[],element** arr)
+* 인 자 : int, int, sublist, element**
+* 리턴형: void
+* 설 명 : path[]를 탐색하면서 정거장과 이동 시간을 출력하는 함수
+*/
 void print_path(int start, int end,sublist subinfo[],element** arr){
     //초기화 단계
     Sub_Time=1;
@@ -305,6 +361,12 @@ void print_path(int start, int end,sublist subinfo[],element** arr){
     printf("정거장 수 : %d 개\n\n",Sub_Cnt);
 }
 
+/*
+* 함수명: calc_path(int start, int end,sublist subinfo[],element** arr)
+* 인 자 : int, int, sublist, element**
+* 리턴형: int
+* 설 명 : path[]를 탐색하면서 총 이동 시간을 리턴하는 함수
+*/
 int calc_path(int start, int end,sublist subinfo[],element** arr){
     //초기화 단계
     shortest_path(arr, start);
@@ -382,8 +444,8 @@ int main(){
     int ov_idx[R]; // 출발역 환승 중복 인덱스 저장 배열
     int ov_time[R]; // 출발역 환승 중복 시간 저장 배열
     int curIdx=0; // 출발역 환승 중복 인덱스 배열 인덱스
-    int min_index;// 출발역이 환승일경우 환승 역중 가장 최단인 인덱스
-    int min_time;
+    int min_index; // 출발역이 환승일경우 환승 역중 가장 최단인 인덱스
+    int min_time; // 출발역이 환승일경우 환승 역중 가장 최단인 시간
 
     while(1){ // 역 이름을 입력하는 부분 
         printf("출발역을 입력해주세요: ");
@@ -441,7 +503,7 @@ int main(){
             ov_time[curIdx++]=calc_path(i, sub2_idx,subinfo,subarray); // 해당 출발역 소요시간 저장
         }
     }
-    min_time = ov_time[0];
+    min_time = ov_time[0];// 0번째 배열값 저장
     min_index = ov_idx[0];
     if(curIdx>1){ //환승이라면()
         for (int i = 1; i < curIdx; i++){
@@ -451,11 +513,11 @@ int main(){
             }
         }
     }
+    
+    shortest_path(subarray, min_index); // 다익스트라
+	print_path(min_index, sub2_idx, subinfo, subarray); // 최종 출력 함수
 
-    shortest_path(subarray, min_index);
-	print_path(min_index, sub2_idx, subinfo, subarray);
-
-    killArray(subarray);
+    killArray(subarray); //인접행렬 free
     printf("프로그램 종료 \n");
 
     return 0;
