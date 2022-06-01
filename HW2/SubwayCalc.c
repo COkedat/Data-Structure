@@ -275,7 +275,6 @@ void print_path(int start, int end,sublist subinfo[],element** arr){
 		way[k++]=path[i]; // i 다음으로 이어지는 인덱스 저장
 		i = path[i]; // 다음
 	}
-    printf("인덱스 %d\n",k);
     if(strcmp(subinfo[way[0]].name,subinfo[way[1]].name)==0) limit+=1; // 도착역과 이전역의 이름이 동일하다면 = 환승이면 한개를 덜 읽게 만든다.
     printf("<출발>\n");
     //printf("(%d분)", Sub_Time);
@@ -283,7 +282,7 @@ void print_path(int start, int end,sublist subinfo[],element** arr){
 	for(int q = k - 1; q > limit; q=q-2){
         if(arr[way[q]][way[q-1]].ic==0){ 
             // 환승이 아닐경우
-            if(q<3||arr[way[q-2]][way[q-3]].ic==0){ //쇼트서킷
+            if(q<3||arr[way[q-2]][way[q-3]].ic==0){ // 쇼트서킷으로 잘못된 참조 방지
                 Now=arr[way[q]][way[q-1]].data;
                 Sub_Time+=Now;
                 //printf("(%d분)", Sub_Time);
@@ -324,7 +323,7 @@ int calc_path(int start, int end,sublist subinfo[],element** arr){
 	for(int q = k - 1; q > limit; q=q-2){
         if(arr[way[q]][way[q-1]].ic==0){ 
             // 환승이 아닐경우
-            if(q<3||arr[way[q-2]][way[q-3]].ic==0){ //쇼트서킷
+            if(q<3||arr[way[q-2]][way[q-3]].ic==0){ // 쇼트서킷으로 잘못된 참조 방지
                 Now=arr[way[q]][way[q-1]].data;
                 Sub_Time+=Now;
             }
