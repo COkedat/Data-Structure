@@ -82,7 +82,6 @@ void initArray(element** arr){
 * 설 명 : 구조체 배열을 할당 해제하는 함수
 */
 void killArray(element** arr){
-
     for (int i = 0; i < R; i++) {
         free(arr[i]);
     }
@@ -240,7 +239,7 @@ void readSubInfo(sublist subinfo[]){
 * 함수명: choose(distance[], n, found[])
 * 인 자 : int 3개
 * 리턴형: int
-* 설 명 : 거리가 가장 작은 인덱스를 리턴하는 함수
+* 설 명 : 시간이 가장 작은 인덱스를 리턴하는 함수
 */
 int choose(int distance[], int n, int found[]){
 	int i, min, minpos;
@@ -330,7 +329,7 @@ void print_path(int start, int end,sublist subinfo[],element** arr){
 	}
     //printf("(%d 인덱스)", k-1);
     if(strcmp(subinfo[way[0]].name,subinfo[way[1]].name)==0) limit+=1; // 도착역과 이전역의 이름이 동일하다면 = 환승이면 한개를 덜 읽게 만든다.
-    printf("<출발>\n");
+    printf("\n<출발>\n");
     //printf("(%d분)", Sub_Time);
     printf("-><%s> %s\n", csvLists[subinfo[way[k-1]].num],subinfo[way[k-1]].name);
 	for(int q = k-1; q > limit; q=q-2){
@@ -458,14 +457,14 @@ void sub_find(element** subarray,sublist subinfo[]){
             sub2[strlen(sub2)-1]='\0';
 
         if(strcmp(sub1,sub2)==0){
-            printf("출발역과 도착역이 동일합니다! \n");
+            printf("에러1 : 출발역과 도착역이 동일합니다! \n");
             printf("다시 입력해주세요! \n");
             continue;
         }
         sub1_idx=subChk(subinfo,sub1);
         sub2_idx=subChk(subinfo,sub2);
         if (sub1_idx==-1||sub2_idx==-1){
-            printf("출발역또는 도착역이 정확하지 않습니다! \n");
+            printf("에러2 : 출발역또는 도착역이 정확하지 않습니다! \n");
             printf("다시 입력해주세요! \n");
             continue;
         }
@@ -481,7 +480,7 @@ void sub_find(element** subarray,sublist subinfo[]){
             Chk_num[strlen(Chk_num)-1]='\0';
 
         if(atoi(Chk_num)!=1&&atoi(Chk_num)!=2){
-            printf("올바르지 않은 값입니다! \n");
+            printf("에러3 : 올바르지 않은 값입니다! \n");
             printf("다시 입력해주세요! \n");
             continue;
         }
