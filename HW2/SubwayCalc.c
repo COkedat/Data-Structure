@@ -318,7 +318,7 @@ int subChk(sublist subinfo[],char chk[]){
 */
 void print_path(int start, int end,sublist subinfo[],element** arr){
     //초기화 단계
-    Sub_Time=1;
+    Sub_Time=0;
     IC_Time=0;
     Sub_Cnt=1;
 	int i = end;
@@ -334,17 +334,18 @@ void print_path(int start, int end,sublist subinfo[],element** arr){
     //printf("(%d 인덱스)", k-1);
     if(strcmp(subinfo[way[0]].name,subinfo[way[1]].name)==0) limit+=1; // 도착역과 이전역의 이름이 동일하다면 = 환승이면 한개를 덜 읽게 만든다.
     printf("<출발>\n");
+    printf("(%d분)", Sub_Time);
     printf("-><%s> %s\n", csvLists[subinfo[way[k-1]].num],subinfo[way[k-1]].name);
 	for(int q = k-1; q > limit; q=q-2){
         if(arr[way[q]][way[q-1]].ic==0){ 
             // 환승이 아닐경우
+            Now=arr[way[q]][way[q-1]].data; //시간은 그대로 저장
+            Sub_Time+=Now;
+            Sub_Cnt++;
             if(q<4||arr[way[q-2]][way[q-3]].ic==0){ // 다음역이 환승역이 아니면 진행, 쇼트서킷으로 잘못된 참조 방지
-                Now=arr[way[q]][way[q-1]].data;
-                Sub_Time+=Now;
                 //printf("(%d분)", Sub_Time);
                 printf("-><%s> %s\n", csvLists[subinfo[way[q-1]].num],subinfo[way[q-1]].name);
             }
-            Sub_Cnt++;
         }
         else{
             // 환승일 경우
@@ -369,13 +370,15 @@ void print_path(int start, int end,sublist subinfo[],element** arr){
 */
 int calc_path(int start, int end,sublist subinfo[],element** arr){
     //초기화 단계
-    shortest_path(arr, start);
-    Sub_Time=1;
+    shortest_path(arr, start); //해당 인덱스의 다익스트라를 돌림
+    Sub_Time=0;
     IC_Time=0;
     Sub_Cnt=1;
 	int i = end;
 	int k = 0;
     int limit = 0;
+    //초기화 단계
+
 	int way[R];
     int Now;
 	while (path[i] != -1){ // -1에 도달할때까지 인덱스들을 저장
@@ -387,14 +390,14 @@ int calc_path(int start, int end,sublist subinfo[],element** arr){
 	for(int q = k-1; q > limit; q=q-2){
         if(arr[way[q]][way[q-1]].ic==0){ 
             // 환승이 아닐경우
-            if(q<4||arr[way[q-2]][way[q-3]].ic==0){ // 다음역이 환승역이 아니면 진행, 쇼트서킷으로 잘못된 참조 방지
-                Now=arr[way[q]][way[q-1]].data;
-                Sub_Time+=Now;
-            }
+            // 가중치를 더하고 정거장 카운트 올림
+            Now=arr[way[q]][way[q-1]].data;
+            Sub_Time+=Now;
             Sub_Cnt++;
         }
         else{
             // 환승일 경우
+            // 가중치를 더하고 정거장 카운트 올림
             if(q<4||arr[way[q-2]][way[q-3]].ic==0){ // 다음역이 환승역(중복)이 아니면 진행, 쇼트서킷으로 잘못된 참조 방지
                 Now=arr[way[q]][way[q-1]].data;
                 if(option==2) Now=arr[way[q]][way[q-1]].data-1000; // 최소환승일경우 가중치가 더해져 있으므로 1000분 제거?
