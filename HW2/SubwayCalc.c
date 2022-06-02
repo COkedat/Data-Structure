@@ -118,7 +118,7 @@ void readSubArray(element** arr,sublist subinfo[]){
     int cRow=0; // 현재 행열 값을 저장하는 벼수
     char *tmp, *line; //줄과 단어 변수 선언
     char buf[2048]; // 버퍼 선언
-    srand(time(NULL));
+    srand(time(NULL)); //완전 랜덤화
 
     //인접행렬 정보 입력
     for (int i = 0; i < 18; i++){
@@ -151,7 +151,7 @@ void readSubArray(element** arr,sublist subinfo[]){
     }
     
     //여기서부터는 환승하는 코드의 인덱스 저장
-    FILE *stream = readCSV(19);
+    FILE *stream = readCSV(19); // 환승파일 읽기
     int tmpCnt = 0;
     int tmpIC[IC];
     line = fgets(buf, 2048, stream);
@@ -161,43 +161,42 @@ void readSubArray(element** arr,sublist subinfo[]){
         if(tmpCnt==IC-1) // 마지막 단어면
                 tmp[strlen(tmp) - 1] = '\0'; // \n을 제거해준다.
         for (int i = 0; i < R; i++){
-            if (strcmp(tmp, subinfo[i].code) == 0){
-                tmpIC[tmpCnt] = i;
+            if (strcmp(tmp, subinfo[i].code) == 0){ // 역 코드가 동일하다면
+                tmpIC[tmpCnt] = i;// 인덱스 저장
                 //printf("%d) %s %d 인덱스 [%s]\n", tmpCnt,tmp,i,subinfo[i].name);
-                tmpCnt++;
+                tmpCnt++; // 다음
             }
         }
-        tmp = strtok(NULL, ",");
+        tmp = strtok(NULL, ",");//다음 읽기
     }
 
     //여기서부터는 환승정보를 인접행렬에 저장
     tmpCnt=0;
-    int m;
-    int n;
     int i=0;
     int j=0;
-    //int tmpMtx[IC][IC];
-    while ((line = fgets(buf, 2048, stream)) != NULL){
+    int m;
+    int n;
+    while ((line = fgets(buf, 2048, stream)) != NULL){ //다음 줄 읽기
         j=0;
         tmp = strtok(line, ",");
         tmp = strtok(NULL, ",");
         while (tmp != NULL){
             if(j==IC-1) // 마지막 단어면
                 tmp[strlen(tmp) - 1] = '\0'; // \n을 제거해준다.
-            m = tmpIC[i];
-            n = tmpIC[j];
-            if (atoi(tmp) != 9999){
+            m = tmpIC[i]; // 행 인덱스 불러오기 
+            n = tmpIC[j]; // 열 인덱스 불러오기 
+            if (atoi(tmp) != 9999){ // 해당 가중치가 방문할 수 있는 값이면
                 //printf("%d(%s), ",n,subinfo[n].name);
                 arr[m][n].data = (rand() % atoi(tmp)) + 1; // 1 ~ 해당 값까지 랜덤 난수로 저장
-                arr[m][n].ic = TRUE;
+                arr[m][n].ic = TRUE; // 해당 지점은 환승이므로 TRUE
             }
             if (j<IC)
-                j++;
+                j++; // 다음 열
             tmp = strtok(NULL, ",");
         }
         //printf("[%d:%s]\n",m,subinfo[m].name);
         if (i<IC-2)
-            i++;
+            i++; // 다음 행
     }
     fclose(stream);
 }
@@ -243,12 +242,12 @@ void readSubInfo(sublist subinfo[]){
 */
 int choose(int distance[], int n, int found[]){
 	int i, min, minpos;
-	min = INT_MAX;
+	min = INT_MAX; // 최대로 설정
 	minpos = -1;
 	for (i = 0; i<n; i++)
-		if (distance[i]< min && !found[i]) {
-			min = distance[i];
-			minpos = i;
+		if (distance[i]< min && !found[i]) { //방문하지 않았고 최소보다 더 작으면
+			min = distance[i]; // 거리 입력
+			minpos = i; // 인덱스 입력
 		}
 	return minpos;
 }
@@ -282,9 +281,9 @@ void shortest_path(element** arr, int start){
 	distance[start] = 0;
 	for (i = 0; i<R-1; i++) {
 		u = choose(distance, R, found);
-		found[u] = TRUE;
-		for (w = 0; w<R; w++)
-			if (!found[w])
+		found[u] = TRUE; // 해당 정점을 방문 표시
+		for (w = 0; w<R; w++) 
+			if (!found[w]) // 방문한적이 없다면
 				if (distance[u] + arr[u][w].data < distance[w]){
 					path[w]=u; //인덱스 저장
 					distance[w] = distance[u] + arr[u][w].data;
@@ -320,6 +319,8 @@ void print_path(int start, int end,sublist subinfo[],element** arr){
 	int i = end;
 	int k = 0;
     int limit = 0;
+    //초기화 단계
+
 	int way[R];
     int Now;
 	while (path[i] != -1){ // -1에 도달할때까지 인덱스들을 저장
@@ -456,14 +457,14 @@ void sub_find(element** subarray,sublist subinfo[]){
         if(sub2 !=NULL && sub2[0]!='\0' && sub2[strlen(sub2)-1]=='\n') 
             sub2[strlen(sub2)-1]='\0';
 
-        if(strcmp(sub1,sub2)==0){
+        if(strcmp(sub1,sub2)==0){ // 출발역과 도착역이 동일하면 에러 1
             printf("에러1 : 출발역과 도착역이 동일합니다! \n");
             printf("다시 입력해주세요! \n");
             continue;
         }
         sub1_idx=subChk(subinfo,sub1);
         sub2_idx=subChk(subinfo,sub2);
-        if (sub1_idx==-1||sub2_idx==-1){
+        if (sub1_idx==-1||sub2_idx==-1){ // 인덱스가 존재하지 않으면 에러 2
             printf("에러2 : 출발역또는 도착역이 정확하지 않습니다! \n");
             printf("다시 입력해주세요! \n");
             continue;
@@ -479,7 +480,7 @@ void sub_find(element** subarray,sublist subinfo[]){
         if(Chk_num !=NULL && Chk_num[0]!='\0' && Chk_num[strlen(Chk_num)-1]=='\n')
             Chk_num[strlen(Chk_num)-1]='\0';
 
-        if(atoi(Chk_num)!=1&&atoi(Chk_num)!=2){
+        if(atoi(Chk_num)!=1&&atoi(Chk_num)!=2){ // 값이 정해진 값이 아니면 에러 3
             printf("에러3 : 올바르지 않은 값입니다! \n");
             printf("다시 입력해주세요! \n");
             continue;
@@ -502,7 +503,7 @@ void sub_find(element** subarray,sublist subinfo[]){
     min_time = ov_time[0]; // 0번째 배열값 저장
     sub1_idx = ov_idx[0]; // 0번째 인덱스 저장
     if(curIdx>1){ 
-        // 환승일 경우
+        // 환승일 경우 (출발역이 여러개)
         for (int i = 1; i < curIdx; i++){
             if (ov_time[i] < min_time){ 
                 // 최소일 경우
