@@ -15,13 +15,10 @@ int Sub_Time=0; // 이동 시간 전역변수 (환승 시간 제외)
 int Sub_Cnt=0; // 정거장 횟수 전역변수 (환승 시간 제외)
 int IC_Time=0; // 환승 시간 전역변수
 int option=1; // 우선방식 여부 전역변수 (1=최단거리, 2=최소환승)
-int trans_done=0; // 가중치 부가 여부 (이미 했을경우 1)
 
 const int R=MAX_VERTICES; // 행렬 상수
 const int C=MAX_VERTICES; // 행렬 상수
 const int IC=150; // 환승역 개수 상수
-
-//int tmp[R][C]; // 임시로 받을 전역행렬
 
 typedef struct sublist{ // 역명 구조체
     char name[30]; // 역명
@@ -30,7 +27,6 @@ typedef struct sublist{ // 역명 구조체
 } sublist;
 
 typedef struct element{ // 인접행렬 구조체
-    //char* name; // 역이름?
     char from[10]; // 출발지
     char to[10]; // 목적지
     int data; // 가는 시간
@@ -266,6 +262,7 @@ int choose(int distance[], int n, int found[]){
 */
 void shortest_path(element** arr, int start){
 	int i, u, w;
+    static int trans_done=0; // 정적변수
 	for (i = 0; i<R; i++){  /* 초기화 */
 		distance[i] = arr[start][i].data;
 		found[i] = FALSE;
@@ -408,17 +405,7 @@ int calc_path(int start, int end,sublist subinfo[],element** arr){
     return Sub_Time+IC_Time;
 }
 
-int main(){
-    printf("프로그램 시작 \n");
-    element** subarray= makeArray();
-    initArray(subarray);
-    
-    sublist subinfo[R];
-
-    readSubInfo(subinfo);
-    readSubArray(subarray,subinfo);
-    
-    int debug=0;
+void debug_print(element** subarray,sublist subinfo[],int debug){
     if (debug==1){
         for(int i=0;i<R;i++){
             for (int j = 0; j < R; j++){
@@ -439,7 +426,9 @@ int main(){
             printf("%d) %s - %s (%s)\n",i,subinfo[i].code,subinfo[i].name,csvLists[subinfo[i].num]);
         }*/
     }
-    
+}
+
+void start_find(element** subarray,sublist subinfo[]){
     char sub1[100]; // 출발역 입력
     char sub2[100]; // 도착역 입력
     int sub1_idx; // 출발역 인덱스
@@ -447,7 +436,6 @@ int main(){
     int ov_idx[R]; // 출발역 환승 중복 인덱스 저장 배열
     int ov_time[R]; // 출발역 환승 중복 시간 저장 배열
     int curIdx=0; // 출발역 환승 중복 인덱스 배열 인덱스
-    int min_index; // 출발역이 환승일경우 환승 역중 가장 최단인 인덱스
     int min_time; // 출발역이 환승일경우 환승 역중 가장 최단인 시간
 
     while(1){ // 역 이름을 입력하는 부분 
@@ -506,22 +494,37 @@ int main(){
             ov_time[curIdx++]=calc_path(i, sub2_idx,subinfo,subarray); // 해당 출발역 소요시간 저장
         }
     }
-    min_time = ov_time[0];// 0번째 배열값 저장
-    min_index = ov_idx[0];
-    if(curIdx>1){ //환승이라면()
+    min_time = ov_time[0]; // 0번째 배열값 저장
+    sub1_idx = ov_idx[0]; // 0번째 인덱스 저장
+    if(curIdx>1){ 
+        // 환승일 경우
         for (int i = 1; i < curIdx; i++){
-            if (ov_time[i] < min_time){ //최소인 출발 환승역 찾기
-                min_time = ov_time[i];
-                min_index = ov_idx[i];
+            if (ov_time[i] < min_time){ 
+                // 최소일 경우
+                min_time = ov_time[i]; // i번째 시간 저장
+                sub1_idx = ov_idx[i]; // i번째 인덱스 저장
             }
         }
     }
+    shortest_path(subarray, sub1_idx); // 다익스트라
+	print_path(sub1_idx, sub2_idx, subinfo, subarray); // 최종 출력 함수
+}
+
+int main(){
+    element** subarray= makeArray();
+    initArray(subarray);
     
-    shortest_path(subarray, min_index); // 다익스트라
-	print_path(min_index, sub2_idx, subinfo, subarray); // 최종 출력 함수
+    sublist subinfo[R];
+
+    readSubInfo(subinfo);
+    readSubArray(subarray,subinfo);
+    
+    debug_print(subarray,subinfo,0);
+    start_find(subarray,subinfo);
+
 
     killArray(subarray); //인접행렬 free
-    printf("프로그램 종료 \n");
+    printf("프로그램이 종료되었습니다 \n");
 
     return 0;
 }
