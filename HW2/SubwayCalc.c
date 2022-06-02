@@ -331,7 +331,7 @@ void print_path(int start, int end,sublist subinfo[],element** arr){
     //printf("(%d 인덱스)", k-1);
     if(strcmp(subinfo[way[0]].name,subinfo[way[1]].name)==0) limit+=1; // 도착역과 이전역의 이름이 동일하다면 = 환승이면 한개를 덜 읽게 만든다.
     printf("<출발>\n");
-    printf("(%d분)", Sub_Time);
+    //printf("(%d분)", Sub_Time);
     printf("-><%s> %s\n", csvLists[subinfo[way[k-1]].num],subinfo[way[k-1]].name);
 	for(int q = k-1; q > limit; q=q-2){
         if(arr[way[q]][way[q-1]].ic==0){ 
@@ -428,7 +428,13 @@ void debug_print(element** subarray,sublist subinfo[],int debug){
     }
 }
 
-void start_find(element** subarray,sublist subinfo[]){
+/*
+* 함수명: sub_find(element** subarray, sublist subinfo[])
+* 인 자 : element**, sublist
+* 리턴형: void
+* 설 명 : 출발역, 도착역과 최단거리, 최소환승을 입력받고 관련 함수들을 돌리는 함수 (사실상 main)
+*/
+void sub_find(element** subarray,sublist subinfo[]){
     char sub1[100]; // 출발역 입력
     char sub2[100]; // 도착역 입력
     int sub1_idx; // 출발역 인덱스
@@ -513,15 +519,13 @@ void start_find(element** subarray,sublist subinfo[]){
 int main(){
     element** subarray= makeArray();
     initArray(subarray);
-    
-    sublist subinfo[R];
 
+    sublist subinfo[R];
     readSubInfo(subinfo);
     readSubArray(subarray,subinfo);
     
     debug_print(subarray,subinfo,0);
-    start_find(subarray,subinfo);
-
+    sub_find(subarray,subinfo);
 
     killArray(subarray); //인접행렬 free
     printf("프로그램이 종료되었습니다 \n");
