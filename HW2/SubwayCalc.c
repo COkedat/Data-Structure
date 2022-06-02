@@ -1,4 +1,4 @@
-// 지하철 최단거리 최소환승 프로그램
+/* 프로그램명: SubwayCalc.c 스택함수를 이용한 스택 계산기 프로그램*/
 
 #include <stdio.h>
 #include <stdlib.h>
