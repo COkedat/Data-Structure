@@ -355,6 +355,8 @@ void print_path(int start, int end,sublist subinfo[],element** arr){
         }
 	}
 	printf("\n");
+    if(option==1) printf("최단거리로 도착\n");
+    if(option==2) printf("최소환승으로 도착\n");
     printf("소요시간 : %d (%d + 환승 소요시간 %d) 분\n",Sub_Time+IC_Time,Sub_Time,IC_Time);
     printf("정거장 수 : %d 개\n\n",Sub_Cnt);
 }
