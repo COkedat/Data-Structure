@@ -128,7 +128,7 @@ void readSubInfo(sublist subinfo[]){
                     strcpy(subinfo[idx].code, tmp);
                 }
                 else if (i == 1){
-                    if(idx!=R-1) // 마지막줄이 아니면
+                    if(idx!=R) // 마지막줄이 아니면
                         tmp[strlen(tmp) - 1] = '\0'; // \n을 제거해준다.
                     strcpy(subinfo[idx].name, tmp);
                 }
@@ -423,10 +423,10 @@ void debug_print(element** subarray,sublist subinfo[],int debug){ //디버그용
                 }
             }
         }
-        /*
+        
         for(int i=0;i<R;i++){
             printf("%d) %s - %s (%s)\n",i,subinfo[i].code,subinfo[i].name,csvLists[subinfo[i].num]);
-        }*/
+        }
     }
 }
 
