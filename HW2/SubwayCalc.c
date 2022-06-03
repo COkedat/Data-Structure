@@ -218,7 +218,7 @@ void readSubArray(element** arr,sublist subinfo[]){
                 tmp[strlen(tmp) - 1] = '\0'; // \n을 제거해준다.
             m = tmpIC[i]; // 행 인덱스 불러오기 
             n = tmpIC[j]; // 열 인덱스 불러오기 
-            if (atoi(tmp) != 9999){ // 해당 가중치가 방문할 수 있는 값이면
+            if (atoi(tmp) != 9999&&atoi(tmp) != 0){ // 해당 가중치가 방문할 수 있는 값이면
                 //printf("%d(%s), ",n,subinfo[n].name);
                 arr[m][n].data = (rand() % atoi(tmp)) + 1; // 1 ~ 해당 값까지 랜덤 난수로 저장
                 arr[m][n].ic = TRUE; // 해당 지점은 환승이므로 TRUE
