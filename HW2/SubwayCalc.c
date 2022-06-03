@@ -48,7 +48,7 @@ char *csvLists[20]={"1호선","1지선","2호선","2지선","3호선","4호선",
 * 함수명: makeArray()
 * 인 자 : 없음
 * 리턴형: element**
-* 설 명 : 구조체 배열을 동적 생성하는 함수
+* 설 명 : 구조체 행렬을 동적 생성하는 함수
 */
 element** makeArray(){
     element **arr = malloc(sizeof(element *) * R);   // 이중 포인터에 (element 포인터 크기 * row)만큼 동적 메모리 할당. 배열의 세로
@@ -63,7 +63,7 @@ element** makeArray(){
 * 함수명: initArray(arr)
 * 인 자 : element**
 * 리턴형: void
-* 설 명 : 구조체 배열 내부를 초기화하는 함수
+* 설 명 : 구조체 행렬 내부를 초기화하는 함수
 */
 void initArray(element** arr){
     for (int i = 0; i < R; i++){
@@ -79,7 +79,7 @@ void initArray(element** arr){
 * 함수명: killArray(arr)
 * 인 자 : element**
 * 리턴형: void
-* 설 명 : 구조체 배열을 할당 해제하는 함수
+* 설 명 : 구조체 행렬을 할당 해제하는 함수
 */
 void killArray(element** arr){
     for (int i = 0; i < R; i++) {
@@ -109,10 +109,43 @@ FILE* readCSV(int i){
 }
 
 /*
+* 함수명: readSubInfo(subinfo[])
+* 인 자 : sublist
+* 리턴형: void
+* 설 명 : 지하철 역명 구조체 정보의 역명과 코드를 채우는 함수
+*/
+void readSubInfo(sublist subinfo[]){
+        char buf[2048];
+        FILE *stream = readCSV(18);
+        char *line, *tmp;
+        line = fgets(buf, 2048, stream); // 한줄 미리 읽음 (안쓰는 칸 거르기)
+        int idx=0;
+        while ((line = fgets(buf, 2048, stream))!=NULL) {
+            int i=0;
+            tmp = strtok(buf, ","); //
+            while (tmp != NULL){
+                if (i == 0){
+                    strcpy(subinfo[idx].code, tmp);
+                }
+                else if (i == 1){
+                    if(idx!=R-1) // 마지막줄이 아니면
+                        tmp[strlen(tmp) - 1] = '\0'; // \n을 제거해준다.
+                    strcpy(subinfo[idx].name, tmp);
+                }
+                i++;
+                tmp = strtok(NULL, "");
+            }
+            idx++;
+        }
+
+        fclose(stream);
+}
+
+/*
 * 함수명: readSubArray(arr,subinfo[])
 * 인 자 : element** , sublist
 * 리턴형: void
-* 설 명 : 인접행렬 구조체의 정보와 지하철 역명 구조체 정보의 호선 인덱스를 채우는 함수
+* 설 명 : 구조체 행렬의 정보와 지하철 역명 구조체 정보의 호선 인덱스를 채우는 함수
 */
 void readSubArray(element** arr,sublist subinfo[]){
     int cRow=0; // 현재 행열 값을 저장하는 벼수
@@ -132,7 +165,7 @@ void readSubArray(element** arr,sublist subinfo[]){
             tmp = strtok(NULL, ","); //다음 단어를 읽음 ( 첫번째 역 코드 뛰어넘기 )
             while (tmp != NULL){ // 읽은 단어가 NULL이 아니면
                 subinfo[cRow + tmpR].num=i; // ~호선 인덱스를 역명 구조체에 저장
-                arr[cRow + tmpR][cRow + tmpC].data = atoi(tmp); // 인접행렬 구조체에 cRow + tmpR,C의 인덱스에 해당 값 저장
+                arr[cRow + tmpR][cRow + tmpC].data = atoi(tmp); // 구조체 행렬에 cRow + tmpR,C의 인덱스에 해당 값 저장
                 tmp = strtok(NULL, ","); //다음 단어를 읽음
                 tmpC++; // 임시 열 추가
             }
@@ -202,36 +235,17 @@ void readSubArray(element** arr,sublist subinfo[]){
 }
 
 /*
-* 함수명: readSubInfo(subinfo[])
-* 인 자 : sublist
-* 리턴형: void
-* 설 명 : 지하철 역명 구조체 정보의 역명과 코드를 채우는 함수
+* 함수명: subChk(subinfo[],chk[])
+* 인 자 : sublist,char
+* 리턴형: int
+* 설 명 : 역명 인덱스를 탐색하는 함수
 */
-void readSubInfo(sublist subinfo[]){
-        char buf[2048];
-        FILE *stream = readCSV(18);
-        char *line, *tmp;
-        line = fgets(buf, 2048, stream); // 한줄 미리 읽음 (안쓰는 칸 거르기)
-        int idx=0;
-        while ((line = fgets(buf, 2048, stream))!=NULL) {
-            int i=0;
-            tmp = strtok(buf, ","); //
-            while (tmp != NULL){
-                if (i == 0){
-                    strcpy(subinfo[idx].code, tmp);
-                }
-                else if (i == 1){
-                    if(idx!=R-1) // 마지막줄이 아니면
-                        tmp[strlen(tmp) - 1] = '\0'; // \n을 제거해준다.
-                    strcpy(subinfo[idx].name, tmp);
-                }
-                i++;
-                tmp = strtok(NULL, "");
-            }
-            idx++;
-        }
-
-        fclose(stream);
+int subChk(sublist subinfo[],char chk[]){
+    for (int i=0;i<R;i++){
+        if (strcmp(chk,subinfo[i].name)==0) //해당하는 문자열을 찾으면
+            return i; //해당 인덱스 출력
+    }
+    return -1; //목록에 없으면 -1 출력
 }
 
 /*
@@ -289,20 +303,6 @@ void shortest_path(element** arr, int start){
 					distance[w] = distance[u] + arr[u][w].data;
 				}
 	}
-}
-
-/*
-* 함수명: subChk(subinfo[],chk[])
-* 인 자 : sublist,char
-* 리턴형: int
-* 설 명 : 역명 인덱스를 탐색하는 함수
-*/
-int subChk(sublist subinfo[],char chk[]){
-    for (int i=0;i<R;i++){
-        if (strcmp(chk,subinfo[i].name)==0) //해당하는 문자열을 찾으면
-            return i; //해당 인덱스 출력
-    }
-    return -1; //목록에 없으면 -1 출력
 }
 
 /*
@@ -405,7 +405,7 @@ int calc_path(int start, int end,sublist subinfo[],element** arr){
     return Sub_Time+IC_Time;
 }
 
-void debug_print(element** subarray,sublist subinfo[],int debug){
+void debug_print(element** subarray,sublist subinfo[],int debug){ //디버그용
     if (debug==1){
         for(int i=0;i<R;i++){
             for (int j = 0; j < R; j++){
