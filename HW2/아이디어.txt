@@ -71,3 +71,27 @@
 근데 환승시간 1~3분은 대체뭐지?
 
 REFtest1을 좀 참고할수있을듯
+
+
+void debug_print(element** subarray,sublist subinfo[],int debug){ //디버그용
+    if (debug==1){
+        for(int i=0;i<R;i++){
+            for (int j = 0; j < R; j++){
+                if(subarray[i][j].data!=9999&&subarray[i][j].data!=0){
+                    if(subarray[i][j].ic==TRUE){
+                        printf("[%d -> %d] : %d ", i,j,subarray[i][j].data);
+                        printf("[%s (%s) -> %s (%s)] 환승\n", subarray[i][j].from,csvLists[subinfo[i].num],subarray[i][j].to,csvLists[subinfo[j].num]);
+                    }
+                    else{
+                        printf("[%d -> %d] : %d ", i,j,subarray[i][j].data);
+                        printf("[%s -> %s]\n", subarray[i][j].from,subarray[i][j].to);
+                    }
+                }
+            }
+        }
+        
+        for(int i=0;i<R;i++){
+            printf("%d) %s - %s (%s)\n",i,subinfo[i].code,subinfo[i].name,csvLists[subinfo[i].num]);
+        }
+    }
+}
