@@ -414,7 +414,7 @@ int calc_path(int start, int end,sublist subinfo[],element** arr){
             // 가중치를 더하고 정거장 카운트 올림
             if(q<4||arr[way[q-2]][way[q-3]].ic==0){ // 다음역이 환승역(중복)이 아니면 진행, 쇼트서킷으로 잘못된 참조 방지
                 Now=arr[way[q]][way[q-1]].data;
-                if(option==2) Now=arr[way[q]][way[q-1]].data-1000; // 최소환승일경우 가중치가 더해져 있으므로 1000분 제거
+                if(option==2) Now=arr[way[q]][way[q-1]].data; // 최소환승일경우 가중치가 더해져 있으므로 1000분 제거?
                 IC_Time+=Now;
             }
         }
@@ -495,6 +495,7 @@ void sub_find(element** subarray,sublist subinfo[]){
             ov_time[curIdx]=calc_path(i, sub2_idx,subinfo,subarray); // 해당 출발역 소요시간 저장
             if (ov_time[curIdx] < min_time){ //최소보다 작을경우
                 // 최소일 경우
+                printf("눗눗\n");
                 min_time = ov_time[curIdx]; // i번째 시간 저장
                 sub1_idx = ov_idx[curIdx]; // i번째 인덱스 저장
                 for(int j=0;j<R;j++){

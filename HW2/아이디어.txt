@@ -73,6 +73,13 @@
 REFtest1을 좀 참고할수있을듯
 
 
+도착역도 여러개로 해야할듯
+
+그리고 환승비교 매키너지므도 어떻게 해야할듯 ㅇㅇ
+
+
+
+
 void debug_print(element** subarray,sublist subinfo[],int debug){ //디버그용
     if (debug==1){
         for(int i=0;i<R;i++){
